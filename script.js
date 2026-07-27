@@ -21,7 +21,7 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Custom Platform Toast Notification System ---
+    // --- Toast Notification System ---
     function showPlatformToast(message, type = 'info') {
         const existingToast = document.querySelector('.platform-toast');
         if (existingToast) existingToast.remove();
@@ -61,20 +61,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3500);
     }
 
-    // --- Mobile Sidebar Toggle & Backdrop ---
+    // --- Sidebar Toggle Logic (Desktop Rail Collapse / Mobile Off-canvas Drawer) ---
+    const appLayout = document.querySelector('.app-layout');
     const sidebar = document.querySelector('.sidebar');
     const sidebarBackdrop = document.querySelector('.sidebar-backdrop');
-    const mobileMenuBtns = document.querySelectorAll('.mobile-menu-btn, .close-sidebar-btn');
+    const toggleTriggers = document.querySelectorAll('.sidebar-trigger');
 
     function toggleSidebar() {
-        sidebar.classList.toggle('is-open');
-        sidebarBackdrop.classList.toggle('is-open');
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('is-open');
+            sidebarBackdrop.classList.toggle('is-open');
+        } else {
+            appLayout.classList.toggle('sidebar-collapsed');
+        }
     }
 
-    mobileMenuBtns.forEach(btn => btn.addEventListener('click', toggleSidebar));
+    toggleTriggers.forEach(btn => btn.addEventListener('click', toggleSidebar));
     if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', toggleSidebar);
 
-    // --- Menu Navigation & Dynamic Empty States ---
+    // --- Navigation & Dynamic Views ---
     const menuLinks = document.querySelectorAll('.menu a');
     const musicGridContainer = document.querySelector('.music-grid');
     const sectionTitle = document.querySelector('.section-title');
@@ -191,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (profileDropdown) profileDropdown.classList.remove('is-open');
     });
 
-    // --- Authentication & Email Verification Handler ---
+    // --- Firebase Authentication ---
     const welcomeLandingOverlay = document.querySelector('.welcome-landing-overlay');
     const landingAuthForm = document.getElementById('landing-auth-form');
     const skipWelcomeLink = document.querySelector('.skip-welcome-link');
@@ -271,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Audio Engine & Track Management ---
+    // --- Audio Engine ---
     const musicCards = document.querySelectorAll('.music-card');
     const trackNameEl = document.querySelector('.track-name');
     const trackArtistEl = document.querySelector('.track-artist');
@@ -372,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadTrack(currentTrackIndex);
     });
 
-    // --- Playlist & Local Import Routing ---
+    // --- Playlist & Upload Handlers ---
     const drawerOverlay = document.querySelector('.playlist-drawer-overlay');
     const openDrawerBtns = document.querySelectorAll('.open-playlist-drawer-btn');
     const closeDrawerBtn = document.querySelector('.close-drawer-btn');
@@ -439,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('harmony_imported_tracks', JSON.stringify(importedTracks));
             updateQueueUI();
             updateCounts();
-            showPlatformToast('Tracks successfully imported to Playlist!', 'success');
+            showPlatformToast('Tracks successfully imported!', 'success');
             audioFileInput.value = '';
         });
     }

@@ -39,94 +39,97 @@
         </div>
     </div>
 
-    <div class="wrapper">
-        <!-- Sidebar Backdrop Overlay for Mobile -->
-        <div class="sidebar-backdrop"></div>
+    <!-- Main App Container -->
+    <div class="app-layout">
+        <div class="main-body">
+            <!-- Sidebar Backdrop Overlay for Mobile -->
+            <div class="sidebar-backdrop"></div>
 
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <i class="fa-solid fa-wave-square"></i>
-                    <span class="logo-text">HARMONY</span>
-                </div>
-                <button class="sidebar-trigger close-sidebar-btn" aria-label="Close Sidebar"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div class="sidebar-content">
-                <div class="menu-group">
-                    <ul class="menu">
-                        <li><a href="#" class="is-active" title="Discover"><i class="fa-solid fa-compass"></i> <span class="menu-label">Discover</span></a></li>
-                        <li><a href="#" title="Albums"><i class="fa-solid fa-compact-disc"></i> <span class="menu-label">Albums</span> <span class="badge albums-count">0</span></a></li>
-                        <li><a href="#" title="Artists"><i class="fa-solid fa-microphone"></i> <span class="menu-label">Artists</span> <span class="badge artists-count">0</span></a></li>
-                        <li><a href="#" class="open-playlist-drawer-btn" title="Playlists"><i class="fa-solid fa-list-music"></i> <span class="menu-label">Playlists</span></a></li>
-                        <li><a href="#" title="Joint Room"><i class="fa-solid fa-users-rectangle"></i> <span class="menu-label">Joint Room</span></a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="sidebar-footer">
-                <div class="profile-container">
-                    <div class="profile-icon">
-                        <span>U</span>
+            <!-- Sidebar Navigation -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <i class="fa-solid fa-wave-square"></i>
+                        <span class="logo-text">HARMONY</span>
                     </div>
-                    <div class="profile-info">
-                        <span class="profile-username">Music Lover</span>
-                        <span class="profile-user-email">Not signed in</span>
-                    </div>
-                    <div class="profile-dropdown">
-                        <a href="#" class="profile-import-audio-btn"><i class="fa-solid fa-file-arrow-up"></i> Import Local Audio</a>
-                        <a href="#" class="sign-out-btn" style="display: none;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
-                    </div>
+                    <button class="sidebar-trigger close-sidebar-btn" aria-label="Close Sidebar"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-            </div>
-        </aside>
-
-        <!-- Main Discovery Content Area -->
-        <main class="main-content">
-            <header class="main-header">
-                <button class="sidebar-trigger mobile-menu-btn" aria-label="Open Sidebar"><i class="fa-solid fa-bars"></i></button>
-                <div class="search-container">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" class="search-bar" placeholder="Search for songs, artists, albums...">
-                </div>
-                <div class="header-profile-trigger profile-icon-mobile"><span>U</span></div>
-            </header>
-
-            <div class="content-body">
-                <div class="featured-album-banner">
-                    <div class="featured-info">
-                        <h2>Featured Album</h2>
-                        <p>Listen to the latest hits in high fidelity.</p>
-                        <button class="play-now-btn">Play Now</button>
+                
+                <div class="sidebar-content">
+                    <div class="menu-group">
+                        <ul class="menu">
+                            <li><a href="#" class="is-active" title="Discover"><i class="fa-solid fa-compass"></i> <span class="menu-label">Discover</span></a></li>
+                            <li><a href="#" title="Albums"><i class="fa-solid fa-compact-disc"></i> <span class="menu-label">Albums</span> <span class="badge albums-count">0</span></a></li>
+                            <li><a href="#" title="Artists"><i class="fa-solid fa-microphone"></i> <span class="menu-label">Artists</span> <span class="badge artists-count">0</span></a></li>
+                            <li><a href="#" class="open-playlist-drawer-btn" title="Playlists"><i class="fa-solid fa-list-music"></i> <span class="menu-label">Playlists</span></a></li>
+                            <li><a href="#" title="Joint Room"><i class="fa-solid fa-users-rectangle"></i> <span class="menu-label">Joint Room</span></a></li>
+                        </ul>
                     </div>
                 </div>
 
-                <h2 class="section-title">Trending Now</h2>
-                <div class="music-grid">
-                    <div class="music-card" data-song="Billie Jean" data-artist="Michael Jackson" data-album="Thriller">
-                        <div class="music-card-info">
-                            <h4>Billie Jean</h4>
-                            <p>Michael Jackson</p>
+                <div class="sidebar-footer">
+                    <div class="profile-container">
+                        <div class="profile-icon">
+                            <span>U</span>
                         </div>
-                    </div>
-                    <div class="music-card" data-song="Midnight City" data-artist="M83" data-album="Hurry Up, We're Dreaming">
-                        <div class="music-card-info">
-                            <h4>Midnight City</h4>
-                            <p>M83</p>
+                        <div class="profile-info">
+                            <span class="profile-username">Music Lover</span>
+                            <span class="profile-user-email">Not signed in</span>
                         </div>
-                    </div>
-                    <div class="music-card" data-song="Starboy" data-artist="The Weeknd" data-album="Starboy">
-                        <div class="music-card-info">
-                            <h4>Starboy</h4>
-                            <p>The Weeknd</p>
+                        <div class="profile-dropdown">
+                            <a href="#" class="profile-import-audio-btn"><i class="fa-solid fa-file-arrow-up"></i> Import Local Audio</a>
+                            <a href="#" class="sign-out-btn" style="display: none;"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</a>
                         </div>
                     </div>
                 </div>
-            </div>
-        </main>
+            </aside>
 
-        <!-- Floating Now Playing Bar -->
+            <!-- Main Content Area -->
+            <main class="main-content">
+                <header class="main-header">
+                    <button class="sidebar-trigger mobile-menu-btn" aria-label="Toggle Sidebar"><i class="fa-solid fa-bars"></i></button>
+                    <div class="search-container">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" class="search-bar" placeholder="Search for songs, artists, albums...">
+                    </div>
+                    <div class="header-profile-trigger profile-icon-mobile"><span>U</span></div>
+                </header>
+
+                <div class="content-body">
+                    <div class="featured-album-banner">
+                        <div class="featured-info">
+                            <h2>Featured Album</h2>
+                            <p>Listen to the latest hits in high fidelity.</p>
+                            <button class="play-now-btn">Play Now</button>
+                        </div>
+                    </div>
+
+                    <h2 class="section-title">Trending Now</h2>
+                    <div class="music-grid">
+                        <div class="music-card" data-song="Billie Jean" data-artist="Michael Jackson" data-album="Thriller">
+                            <div class="music-card-info">
+                                <h4>Billie Jean</h4>
+                                <p>Michael Jackson</p>
+                            </div>
+                        </div>
+                        <div class="music-card" data-song="Midnight City" data-artist="M83" data-album="Hurry Up, We're Dreaming">
+                            <div class="music-card-info">
+                                <h4>Midnight City</h4>
+                                <p>M83</p>
+                            </div>
+                        </div>
+                        <div class="music-card" data-song="Starboy" data-artist="The Weeknd" data-album="Starboy">
+                            <div class="music-card-info">
+                                <h4>Starboy</h4>
+                                <p>The Weeknd</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Fixed Now Playing Bar -->
         <footer class="now-playing-bar">
             <div class="current-track">
                 <div class="track-art placeholder-art"><i class="fa-solid fa-music"></i></div>
@@ -153,22 +156,22 @@
                 <button class="control-btn open-playlist-drawer-btn"><i class="fa-solid fa-list"></i></button>
             </div>
         </footer>
+    </div>
 
-        <!-- Playlist & Queue Drawer Overlay -->
-        <div class="playlist-drawer-overlay">
-            <div class="playlist-drawer">
-                <div class="drawer-header">
-                    <h3>Library & Playlists</h3>
-                    <button class="close-drawer-btn"><i class="fa-solid fa-xmark"></i></button>
+    <!-- Playlist & Queue Drawer Overlay -->
+    <div class="playlist-drawer-overlay">
+        <div class="playlist-drawer">
+            <div class="drawer-header">
+                <h3>Library & Playlists</h3>
+                <button class="close-drawer-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="drawer-content">
+                <div class="drawer-actions">
+                    <button class="create-playlist-btn"><i class="fa-solid fa-plus"></i> New Playlist</button>
+                    <input type="file" id="audio-file-input" accept="audio/*" multiple style="display: none;">
                 </div>
-                <div class="drawer-content">
-                    <div class="drawer-actions">
-                        <button class="create-playlist-btn"><i class="fa-solid fa-plus"></i> New Playlist</button>
-                        <input type="file" id="audio-file-input" accept="audio/*" multiple style="display: none;">
-                    </div>
-                    <h4>Current Queue</h4>
-                    <ul class="queue-list"></ul>
-                </div>
+                <h4>Current Queue</h4>
+                <ul class="queue-list"></ul>
             </div>
         </div>
     </div>
