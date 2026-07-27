@@ -6,7 +6,6 @@
     --accent-color: #6366f1;
     --text-main: #f8fafc;
     --text-muted: #94a3b8;
-    --glass-blur: 16px;
 }
 
 * {
@@ -30,7 +29,7 @@ body {
     position: relative;
 }
 
-/* Sidebar Styles & Mobile Responsiveness Fix */
+/* Sidebar Styles & Mobile Collapsed Toggle Behavior */
 .sidebar {
     width: 260px;
     background: var(--sidebar-bg);
@@ -38,7 +37,7 @@ body {
     display: flex;
     flex-direction: column;
     z-index: 100;
-    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), transform 0.3s ease;
 }
 
 .sidebar-backdrop {
@@ -52,12 +51,45 @@ body {
     z-index: 99;
 }
 
+/* Desktop Collapsed Toggle Class */
+.wrapper.sidebar-collapsed .sidebar {
+    width: 72px;
+}
+
+.wrapper.sidebar-collapsed .sidebar .logo-text,
+.wrapper.sidebar-collapsed .sidebar .menu-label,
+.wrapper.sidebar-collapsed .sidebar .badge,
+.wrapper.sidebar-collapsed .sidebar .profile-info,
+.wrapper.sidebar-collapsed .sidebar .close-sidebar-btn {
+    display: none !important;
+}
+
+.wrapper.sidebar-collapsed .sidebar .sidebar-header {
+    justify-content: center;
+    padding: 20px 10px;
+}
+
+.wrapper.sidebar-collapsed .sidebar .menu a {
+    justify-content: center;
+    padding: 12px;
+}
+
+.wrapper.sidebar-collapsed .sidebar .menu a i {
+    font-size: 18px;
+    width: auto;
+}
+
+.wrapper.sidebar-collapsed .sidebar .profile-container {
+    justify-content: center;
+}
+
 @media (max-width: 768px) {
     .sidebar {
         position: fixed;
         top: 0;
         bottom: 0;
         left: 0;
+        width: 260px;
         transform: translateX(-100%);
     }
     .sidebar.is-open {
@@ -66,6 +98,16 @@ body {
     .sidebar-backdrop.is-open {
         opacity: 1;
         pointer-events: auto;
+    }
+    .wrapper.sidebar-collapsed .sidebar {
+        width: 260px;
+    }
+    .wrapper.sidebar-collapsed .sidebar .logo-text,
+    .wrapper.sidebar-collapsed .sidebar .menu-label,
+    .wrapper.sidebar-collapsed .sidebar .badge,
+    .wrapper.sidebar-collapsed .sidebar .profile-info,
+    .wrapper.sidebar-collapsed .sidebar .close-sidebar-btn {
+        display: block !important;
     }
 }
 
@@ -96,16 +138,6 @@ body {
     color: var(--text-muted);
     cursor: pointer;
     font-size: 18px;
-}
-
-.close-sidebar-btn {
-    display: none;
-}
-
-@media (max-width: 768px) {
-    .close-sidebar-btn {
-        display: block;
-    }
 }
 
 .sidebar-content {
