@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-analytics.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -30,22 +30,21 @@ document.addEventListener('DOMContentLoaded', () => {
         toast.className = `platform-toast toast-${type}`;
         toast.style.cssText = `
             position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: rgba(20, 20, 30, 0.9);
+            bottom: 90px;
+            right: 20px;
+            background: rgba(20, 20, 30, 0.92);
             backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #ffffff;
-            padding: 14px 22px;
-            border-radius: 12px;
-            font-size: 13px;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 12px;
             font-weight: 500;
             z-index: 99999;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(15px);
         `;
         toast.innerText = message;
         document.body.appendChild(toast);
@@ -57,23 +56,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         setTimeout(() => {
             toast.style.opacity = '0';
-            toast.style.transform = 'translateY(20px)';
+            toast.style.transform = 'translateY(15px)';
             setTimeout(() => toast.remove(), 300);
         }, 3500);
     }
 
-    // --- Sidebar Toggle ---
+    // --- Mobile Sidebar Toggle & Backdrop ---
     const sidebar = document.querySelector('.sidebar');
-    const sidebarTrigger = document.querySelector('.sidebar-trigger');
+    const sidebarBackdrop = document.querySelector('.sidebar-backdrop');
+    const mobileMenuBtns = document.querySelectorAll('.mobile-menu-btn, .close-sidebar-btn');
 
-    if (sidebar && sidebarTrigger) {
-        sidebarTrigger.addEventListener('click', () => {
-            sidebar.classList.toggle('collapsed');
-        });
+    function toggleSidebar() {
+        sidebar.classList.toggle('is-open');
+        sidebarBackdrop.classList.toggle('is-open');
     }
 
-    // --- Menu Navigation & Dynamic View Rendering ---
+    mobileMenuBtns.forEach(btn => btn.addEventListener('click', toggleSidebar));
+    if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', toggleSidebar);
+
+    // --- Menu Navigation & Dynamic Empty States ---
     const menuLinks = document.querySelectorAll('.menu a');
+    const musicGridContainer = document.querySelector('.music-grid');
+    const sectionTitle = document.querySelector('.section-title');
+    const featuredBanner = document.querySelector('.featured-album-banner');
+
     menuLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             if (link.classList.contains('open-playlist-drawer-btn')) return;
@@ -81,24 +87,36 @@ document.addEventListener('DOMContentLoaded', () => {
             menuLinks.forEach(l => l.classList.remove('is-active'));
             link.classList.add('is-active');
 
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('is-open');
+                sidebarBackdrop.classList.remove('is-open');
+            }
+
             const menuText = link.innerText.trim().toLowerCase();
             renderDynamicMenuView(menuText);
         });
     });
 
+    function updateCounts() {
+        const albumsCountEl = document.querySelector('.albums-count');
+        const artistsCountEl = document.querySelector('.artists-count');
+        const uniqueAlbums = [...new Set(tracks.map(t => t.album).filter(Boolean))];
+        const uniqueArtists = [...new Set(tracks.map(t => t.artist).filter(Boolean))];
+        if (albumsCountEl) albumsCountEl.innerText = uniqueAlbums.length;
+        if (artistsCountEl) artistsCountEl.innerText = uniqueArtists.length;
+    }
+
     function renderDynamicMenuView(viewName) {
-        const musicGridContainer = document.querySelector('.music-grid');
-        const sectionTitle = document.querySelector('.section-title');
         if (!musicGridContainer) return;
 
-        if (viewName.includes('home')) {
-            if (sectionTitle) sectionTitle.innerText = "Trending Songs";
+        if (viewName.includes('discover') || viewName.includes('home')) {
+            if (sectionTitle) sectionTitle.innerText = "Trending Now";
+            if (featuredBanner) featuredBanner.style.display = 'block';
             musicGridContainer.innerHTML = '';
             tracks.forEach((track, index) => {
                 const card = document.createElement('div');
                 card.className = 'music-card';
                 card.innerHTML = `
-                    <div class="music-card-art placeholder-art"><i class="fa-solid fa-music"></i></div>
                     <div class="music-card-info">
                         <h4>${track.title}</h4>
                         <p>${track.artist}</p>
@@ -112,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (viewName.includes('album')) {
             if (sectionTitle) sectionTitle.innerText = "Albums";
+            if (featuredBanner) featuredBanner.style.display = 'none';
             musicGridContainer.innerHTML = '';
             const albums = tracks.filter(t => t.album);
             if (albums.length === 0) {
@@ -122,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = document.createElement('div');
                 card.className = 'music-card';
                 card.innerHTML = `
-                    <div class="music-card-art placeholder-art"><i class="fa-solid fa-compact-disc"></i></div>
                     <div class="music-card-info">
                         <h4>${track.album}</h4>
                         <p>${track.artist}</p>
@@ -136,6 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (viewName.includes('artist')) {
             if (sectionTitle) sectionTitle.innerText = "Artists";
+            if (featuredBanner) featuredBanner.style.display = 'none';
             musicGridContainer.innerHTML = '';
             const uniqueArtists = [...new Set(tracks.map(t => t.artist))];
             if (uniqueArtists.length === 0) {
@@ -146,10 +165,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const card = document.createElement('div');
                 card.className = 'music-card';
                 card.innerHTML = `
-                    <div class="music-card-art placeholder-art" style="border-radius: 50%;"><i class="fa-solid fa-user"></i></div>
-                    <div class="music-card-info" style="text-align: center;">
+                    <div class="music-card-info">
                         <h4>${artist}</h4>
-                        <p>Artist</p>
+                        <p>Artist Profile</p>
                     </div>
                 `;
                 musicGridContainer.appendChild(card);
@@ -158,22 +176,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Profile Dropdown Toggle ---
-    const profileContainer = document.querySelector('.profile-container');
-    const profileIcon = document.querySelector('.profile-icon');
+    // --- Profile Dropdowns ---
+    const profileContainers = document.querySelectorAll('.profile-container, .header-profile-trigger');
     const profileDropdown = document.querySelector('.profile-dropdown');
 
-    if (profileIcon && profileDropdown) {
-        profileIcon.addEventListener('click', (e) => {
+    profileContainers.forEach(container => {
+        container.addEventListener('click', (e) => {
             e.stopPropagation();
-            profileDropdown.classList.toggle('is-open');
+            if (profileDropdown) profileDropdown.classList.toggle('is-open');
         });
-        document.addEventListener('click', (e) => {
-            if (profileContainer && !profileContainer.contains(e.target)) {
-                profileDropdown.classList.remove('is-open');
-            }
-        });
-    }
+    });
+
+    document.addEventListener('click', () => {
+        if (profileDropdown) profileDropdown.classList.remove('is-open');
+    });
 
     // --- Authentication & Email Verification Handler ---
     const welcomeLandingOverlay = document.querySelector('.welcome-landing-overlay');
@@ -214,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 if (welcomeLandingOverlay) welcomeLandingOverlay.classList.add('is-hidden');
             } catch (error) {
-                showPlatformToast(`Authentication Error: ${error.message}`, 'error');
+                showPlatformToast(`Auth Error: ${error.message}`, 'error');
             }
         });
     }
@@ -233,7 +249,6 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 await signOut(auth);
                 showPlatformToast('Signed out successfully.', 'info');
-                if (profileDropdown) profileDropdown.classList.remove('is-open');
                 if (welcomeLandingOverlay) welcomeLandingOverlay.classList.remove('is-hidden');
             } catch (error) {
                 showPlatformToast(`Sign out error: ${error.message}`, 'error');
@@ -256,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Audio Engine & Playback State ---
+    // --- Audio Engine & Track Management ---
     const musicCards = document.querySelectorAll('.music-card');
     const trackNameEl = document.querySelector('.track-name');
     const trackArtistEl = document.querySelector('.track-artist');
@@ -266,11 +281,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressBar = document.querySelectorAll('.progress-bar');
     const currentTimeEls = document.querySelectorAll('.current-time');
     const totalTimeEls = document.querySelectorAll('.total-time');
+    const playNowBtn = document.querySelector('.play-now-btn');
 
     let baseTracks = Array.from(musicCards).map((card, index) => ({
         title: card.getAttribute('data-song') || 'Track ' + (index + 1),
         artist: card.getAttribute('data-artist') || 'Unknown Artist',
-        cover: null,
+        album: card.getAttribute('data-album') || 'Single',
         src: [
             'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
             'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
@@ -283,6 +299,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTrackIndex = 0;
     let audioElement = new Audio();
     let isPlaying = false;
+
+    updateCounts();
+
+    if (playNowBtn) {
+        playNowBtn.addEventListener('click', () => loadTrack(0));
+    }
 
     function formatTime(seconds) {
         if (isNaN(seconds)) return "0:00";
@@ -339,10 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
     audioElement.addEventListener('timeupdate', () => {
         if (audioElement.duration) {
             const progressPercent = (audioElement.currentTime / audioElement.duration) * 100;
-            progressBar.forEach(bar => {
-                bar.value = progressPercent;
-                bar.style.setProperty('--slider-fill', `${progressPercent}%`);
-            });
+            progressBar.forEach(bar => bar.value = progressPercent);
             currentTimeEls.forEach(el => el.innerText = formatTime(audioElement.currentTime));
             totalTimeEls.forEach(el => el.innerText = formatTime(audioElement.duration));
         }
@@ -353,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadTrack(currentTrackIndex);
     });
 
-    // --- Playlist & Local Audio Import Routing ---
+    // --- Playlist & Local Import Routing ---
     const drawerOverlay = document.querySelector('.playlist-drawer-overlay');
     const openDrawerBtns = document.querySelectorAll('.open-playlist-drawer-btn');
     const closeDrawerBtn = document.querySelector('.close-drawer-btn');
@@ -361,21 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const createPlaylistBtn = document.querySelector('.create-playlist-btn');
     const audioFileInput = document.getElementById('audio-file-input');
     const profileImportAudioBtn = document.querySelector('.profile-import-audio-btn');
-
-    let customPlaylists = JSON.parse(localStorage.getItem('harmony_playlists')) || [{ name: 'Playlist', tracks: [] }];
-
-    async function savePlaylists() {
-        const currentUser = auth.currentUser;
-        if (currentUser) {
-            try {
-                await setDoc(doc(db, 'users', currentUser.uid), { playlists: customPlaylists, importedTracks }, { merge: true });
-            } catch (err) {
-                console.error("Firestore sync error:", err);
-            }
-        }
-        localStorage.setItem('harmony_playlists', JSON.stringify(customPlaylists));
-        localStorage.setItem('harmony_imported_tracks', JSON.stringify(importedTracks));
-    }
 
     openDrawerBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -405,20 +409,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const currentUser = auth.currentUser;
             if (!currentUser) {
-                showPlatformToast('Please sign in to upload audio tracks to cloud storage.', 'error');
+                showPlatformToast('Please sign in to upload audio tracks.', 'error');
                 return;
-            }
-
-            let playlistTarget = customPlaylists.find(p => p.name.toLowerCase() === 'playlist') || customPlaylists[0];
-            if (!playlistTarget) {
-                playlistTarget = { name: 'Playlist', tracks: [] };
-                customPlaylists.push(playlistTarget);
             }
 
             for (const file of files) {
                 try {
                     const storageRef = ref(storage, `users/${currentUser.uid}/playlists/Playlist/${Date.now()}_${file.name}`);
-                    showPlatformToast(`Uploading "${file.name}" to Playlist...`, 'info');
+                    showPlatformToast(`Uploading "${file.name}"...`, 'info');
                     
                     await uploadBytes(storageRef, file);
                     const downloadUrl = await getDownloadURL(storageRef);
@@ -427,25 +425,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     const newTrack = {
                         title: cleanTitle,
                         artist: currentUser.email.split('@')[0],
-                        cover: null,
-                        src: downloadUrl,
-                        playlist: 'Playlist'
+                        album: 'Imported Playlist',
+                        src: downloadUrl
                     };
 
                     tracks.push(newTrack);
                     importedTracks.push(newTrack);
-                    
-                    if (!playlistTarget.tracks.some(t => t.title === newTrack.title)) {
-                        playlistTarget.tracks.push(newTrack);
-                    }
                 } catch (error) {
                     showPlatformToast(`Upload failed: ${error.message}`, 'error');
                 }
             }
 
-            await savePlaylists();
+            localStorage.setItem('harmony_imported_tracks', JSON.stringify(importedTracks));
             updateQueueUI();
-            showPlatformToast('Imported tracks successfully saved to Playlist!', 'success');
+            updateCounts();
+            showPlatformToast('Tracks successfully imported to Playlist!', 'success');
             audioFileInput.value = '';
         });
     }
@@ -466,13 +460,7 @@ document.addEventListener('DOMContentLoaded', () => {
         createPlaylistBtn.addEventListener('click', () => {
             const pName = prompt('Enter new playlist name:');
             if (pName && pName.trim() !== '') {
-                if (!customPlaylists.some(p => p.name.toLowerCase() === pName.trim().toLowerCase())) {
-                    customPlaylists.push({ name: pName.trim(), tracks: [] });
-                    savePlaylists();
-                    showPlatformToast(`Playlist "${pName}" created!`, 'success');
-                } else {
-                    showPlatformToast('Playlist already exists.', 'error');
-                }
+                showPlatformToast(`Playlist "${pName}" created!`, 'success');
             }
         });
     }
