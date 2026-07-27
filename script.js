@@ -21,9 +21,9 @@ const db = getFirestore(app);
 const storage = getStorage(app);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Custom Platform Notification Banner ---
+    // --- Custom Platform Toast Notification System ---
     function showPlatformToast(message, type = 'info') {
-        let existingToast = document.querySelector('.platform-toast');
+        const existingToast = document.querySelector('.platform-toast');
         if (existingToast) existingToast.remove();
 
         const toast = document.createElement('div');
@@ -32,11 +32,11 @@ document.addEventListener('DOMContentLoaded', () => {
             position: fixed;
             bottom: 30px;
             right: 30px;
-            background: var(--glass-bg, rgba(20, 20, 30, 0.85));
+            background: rgba(20, 20, 30, 0.9);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.1));
-            color: var(--text-main, #ffffff);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
             padding: 14px 22px;
             border-radius: 12px;
             font-size: 13px;
@@ -72,12 +72,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Menu Navigation & Dynamic View Switching ---
+    // --- Menu Navigation & Dynamic View Rendering ---
     const menuLinks = document.querySelectorAll('.menu a');
-    const mainContentArea = document.querySelector('.main-content') || document.querySelector('.wrapper');
-
     menuLinks.forEach(link => {
         link.addEventListener('click', (e) => {
+            if (link.classList.contains('open-playlist-drawer-btn')) return;
             e.preventDefault();
             menuLinks.forEach(l => l.classList.remove('is-active'));
             link.classList.add('is-active');
@@ -89,20 +88,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderDynamicMenuView(viewName) {
         const musicGridContainer = document.querySelector('.music-grid');
-        const sectionTitle = document.querySelector('.section-title') || document.querySelector('.discovery-title');
-        
+        const sectionTitle = document.querySelector('.section-title');
         if (!musicGridContainer) return;
 
-        if (viewName.includes('home') || viewName.includes('discover')) {
+        if (viewName.includes('home')) {
             if (sectionTitle) sectionTitle.innerText = "Trending Songs";
             musicGridContainer.innerHTML = '';
             tracks.forEach((track, index) => {
                 const card = document.createElement('div');
                 card.className = 'music-card';
-                card.setAttribute('data-song', track.title);
-                card.setAttribute('data-artist', track.artist);
                 card.innerHTML = `
-                    <div class="music-card-art ${track.cover ? '' : 'placeholder-art'}">${track.cover ? `<img src="${track.cover}" alt="Art">` : '<i class="fa-solid fa-music"></i>'}</div>
+                    <div class="music-card-art placeholder-art"><i class="fa-solid fa-music"></i></div>
                     <div class="music-card-info">
                         <h4>${track.title}</h4>
                         <p>${track.artist}</p>
@@ -114,52 +110,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (viewName.includes('playlist')) {
-            if (sectionTitle) sectionTitle.innerText = "Your Playlists";
-            musicGridContainer.innerHTML = '';
-            
-            if (customPlaylists.length === 0 || customPlaylists.every(p => p.tracks.length === 0)) {
-                musicGridContainer.innerHTML = `<div class="empty-state-msg" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted, #888); font-style: italic;">You have no playlists</div>`;
-                return;
-            }
-
-            customPlaylists.forEach(playlist => {
-                if (playlist.tracks.length === 0) return;
-                playlist.tracks.forEach((track) => {
-                    const card = document.createElement('div');
-                    card.className = 'music-card';
-                    card.innerHTML = `
-                        <div class="music-card-art placeholder-art"><i class="fa-solid fa-compact-disc"></i></div>
-                        <div class="music-card-info">
-                            <h4>${track.title}</h4>
-                            <p>${playlist.name} • ${track.artist}</p>
-                        </div>
-                    `;
-                    card.addEventListener('click', () => {
-                        const globalIndex = tracks.findIndex(t => t.title === track.title);
-                        if (globalIndex !== -1) loadTrack(globalIndex);
-                    });
-                    musicGridContainer.appendChild(card);
-                });
-            });
-            return;
-        }
-
         if (viewName.includes('album')) {
             if (sectionTitle) sectionTitle.innerText = "Albums";
             musicGridContainer.innerHTML = '';
-            const albums = tracks.filter(t => t.album || t.title);
+            const albums = tracks.filter(t => t.album);
             if (albums.length === 0) {
-                musicGridContainer.innerHTML = `<div class="empty-state-msg" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted, #888); font-style: italic;">You have no albums</div>`;
+                musicGridContainer.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); font-style: italic;">You have no albums</div>`;
                 return;
             }
             albums.forEach((track, index) => {
                 const card = document.createElement('div');
                 card.className = 'music-card';
                 card.innerHTML = `
-                    <div class="music-card-art placeholder-art"><i class="fa-solid record-vinyl"></i></div>
+                    <div class="music-card-art placeholder-art"><i class="fa-solid fa-compact-disc"></i></div>
                     <div class="music-card-info">
-                        <h4>${track.album || track.title}</h4>
+                        <h4>${track.album}</h4>
                         <p>${track.artist}</p>
                     </div>
                 `;
@@ -174,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             musicGridContainer.innerHTML = '';
             const uniqueArtists = [...new Set(tracks.map(t => t.artist))];
             if (uniqueArtists.length === 0) {
-                musicGridContainer.innerHTML = `<div class="empty-state-msg" style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted, #888); font-style: italic;">You have no artists</div>`;
+                musicGridContainer.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: var(--text-muted); font-style: italic;">You have no artists</div>`;
                 return;
             }
             uniqueArtists.forEach(artist => {
@@ -184,7 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="music-card-art placeholder-art" style="border-radius: 50%;"><i class="fa-solid fa-user"></i></div>
                     <div class="music-card-info" style="text-align: center;">
                         <h4>${artist}</h4>
-                        <p>Artist Profile</p>
+                        <p>Artist</p>
                     </div>
                 `;
                 musicGridContainer.appendChild(card);
@@ -210,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Authentication & Email Verification Fix ---
+    // --- Authentication & Email Verification Handler ---
     const welcomeLandingOverlay = document.querySelector('.welcome-landing-overlay');
     const landingAuthForm = document.getElementById('landing-auth-form');
     const skipWelcomeLink = document.querySelector('.skip-welcome-link');
@@ -242,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const user = userCredential.user;
                     await sendEmailVerification(user);
                     await setDoc(doc(db, 'users', user.uid), { username, email }, { merge: true });
-                    showPlatformToast('Account created! Verification email sent. Please check your inbox.', 'success');
+                    showPlatformToast('Account created! Verification email sent. Check your inbox.', 'success');
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
                     showPlatformToast('Signed in successfully!', 'success');
@@ -261,6 +226,36 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    const signOutBtn = document.querySelector('.sign-out-btn');
+    if (signOutBtn) {
+        signOutBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await signOut(auth);
+                showPlatformToast('Signed out successfully.', 'info');
+                if (profileDropdown) profileDropdown.classList.remove('is-open');
+                if (welcomeLandingOverlay) welcomeLandingOverlay.classList.remove('is-hidden');
+            } catch (error) {
+                showPlatformToast(`Sign out error: ${error.message}`, 'error');
+            }
+        });
+    }
+
+    onAuthStateChanged(auth, (user) => {
+        const profileUserEmail = document.querySelector('.profile-user-email');
+        const profileUsername = document.querySelector('.profile-username');
+        if (user) {
+            if (profileUserEmail) profileUserEmail.innerText = user.email;
+            if (profileUsername) profileUsername.innerText = user.email.split('@')[0];
+            if (signOutBtn) signOutBtn.style.display = 'flex';
+            if (welcomeLandingOverlay) welcomeLandingOverlay.classList.add('is-hidden');
+        } else {
+            if (profileUserEmail) profileUserEmail.innerText = 'Not signed in';
+            if (profileUsername) profileUsername.innerText = 'Music Lover';
+            if (signOutBtn) signOutBtn.style.display = 'none';
+        }
+    });
+
     // --- Audio Engine & Playback State ---
     const musicCards = document.querySelectorAll('.music-card');
     const trackNameEl = document.querySelector('.track-name');
@@ -276,7 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
         title: card.getAttribute('data-song') || 'Track ' + (index + 1),
         artist: card.getAttribute('data-artist') || 'Unknown Artist',
         cover: null,
-        lyrics: 'No lyrics available.',
         src: [
             'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
             'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
@@ -359,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadTrack(currentTrackIndex);
     });
 
-    // --- Playlist & Local Audio Import Routing Fix ---
+    // --- Playlist & Local Audio Import Routing ---
     const drawerOverlay = document.querySelector('.playlist-drawer-overlay');
     const openDrawerBtns = document.querySelectorAll('.open-playlist-drawer-btn');
     const closeDrawerBtn = document.querySelector('.close-drawer-btn');
@@ -368,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const audioFileInput = document.getElementById('audio-file-input');
     const profileImportAudioBtn = document.querySelector('.profile-import-audio-btn');
 
-    let customPlaylists = JSON.parse(localStorage.getItem('harmony_playlists')) || [{ name: 'Favorites', tracks: [] }];
+    let customPlaylists = JSON.parse(localStorage.getItem('harmony_playlists')) || [{ name: 'Playlist', tracks: [] }];
 
     async function savePlaylists() {
         const currentUser = auth.currentUser;
@@ -434,7 +428,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         title: cleanTitle,
                         artist: currentUser.email.split('@')[0],
                         cover: null,
-                        lyrics: 'No lyrics available.',
                         src: downloadUrl,
                         playlist: 'Playlist'
                     };
