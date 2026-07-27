@@ -2,57 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Harmony - Music Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Harmony - Web Player</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- Main Player Container -->
-  <div class="container">
-    <div class="card">
-      <h2>Harmony Player</h2>
-      <p class="subtitle">Play your local audio tracks</p>
+  <!-- Main Player Layout -->
+  <main class="app-container">
+    <header class="app-header">
+      <div class="logo-badge">🎵</div>
+      <h1>Harmony</h1>
+      <p class="tagline">Your personal audio player</p>
+    </header>
 
-      <!-- Import Audio Button & File Input -->
-      <div class="upload-section">
-        <label for="audioInput" class="custom-file-upload">
-          Import Music
-        </label>
-        <!-- Modified 'accept' attribute explicitly for iOS Safari file picker -->
-        <input 
-          type="file" 
-          id="audioInput" 
-          accept="audio/mp3, audio/wav, audio/m4a, audio/aac, .mp3, .wav, .m4a, .aac" 
-          multiple 
-        />
+    <!-- Upload Card -->
+    <section class="card upload-card">
+      <div class="upload-icon">📁</div>
+      <h2>Import Tracks</h2>
+      <p class="card-desc">Select local files from your device to start listening.</p>
+      
+      <label for="audioInput" class="btn primary-btn upload-label">
+        Choose Audio Files
+      </label>
+      <input 
+        type="file" 
+        id="audioInput" 
+        accept="audio/mp3, audio/wav, audio/m4a, audio/aac, .mp3, .wav, .m4a, .aac" 
+        multiple 
+      />
+    </section>
+
+    <!-- Player Card -->
+    <section class="card player-card">
+      <div class="track-info">
+        <span class="track-label">Now Playing</span>
+        <h3 id="nowPlayingTitle">No track selected</h3>
       </div>
 
-      <!-- Player UI -->
-      <div class="player-controls">
-        <p id="nowPlaying">No track loaded</p>
+      <div class="audio-wrapper">
         <audio id="audioPlayer" controls></audio>
       </div>
+    </section>
 
-      <!-- Actions -->
-      <div class="actions">
-        <a href="#" id="forgotPasswordLink">Forgot password?</a>
-      </div>
-    </div>
-  </div>
+    <!-- Footer Actions -->
+    <footer class="app-footer">
+      <button type="button" id="forgotPasswordBtn" class="link-btn">
+        Forgot password?
+      </button>
+    </footer>
+  </main>
 
   <!-- Reset Password Modal -->
-  <div id="resetModal" class="modal">
-    <div class="modal-content">
-      <span class="close-btn" id="closeResetModal">&times;</span>
-      <h3>Reset Password</h3>
-      <p class="modal-sub">Enter your account email to receive a recovery link.</p>
+  <div id="resetModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-card">
+      <button type="button" id="closeResetModal" class="close-icon" aria-label="Close">&times;</button>
       
-      <form id="resetForm">
-        <div class="input-group">
-          <input type="email" id="resetEmail" placeholder="name@example.com" required />
+      <div class="modal-header">
+        <h3>Reset Password</h3>
+        <p>Enter your email address and we'll send you instructions to reset your password.</p>
+      </div>
+
+      <form id="resetForm" class="modal-form">
+        <div class="form-group">
+          <label for="resetEmail">Email Address</label>
+          <input 
+            type="email" 
+            id="resetEmail" 
+            placeholder="e.g. name@example.com" 
+            required 
+            autocomplete="email"
+          />
         </div>
-        <button type="submit" class="primary-btn">Send Reset Link</button>
+        <button type="submit" class="btn primary-btn full-width">Send Recovery Link</button>
       </form>
     </div>
   </div>

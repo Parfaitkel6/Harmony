@@ -1,62 +1,73 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // DOM Elements
+  const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+  const closeResetModal = document.getElementById('closeResetModal');
+  const resetModal = document.getElementById('resetModal');
+  const resetForm = document.getElementById('resetForm');
   const audioInput = document.getElementById('audioInput');
   const audioPlayer = document.getElementById('audioPlayer');
-  const nowPlaying = document.getElementById('nowPlaying');
+  const nowPlayingTitle = document.getElementById('nowPlayingTitle');
 
-  // Handle File Input Selection
+  // --- Reset Password Modal Functions ---
+  const openModal = () => {
+    resetModal.classList.add('active');
+    resetModal.setAttribute('aria-hidden', 'false');
+  };
+
+  const closeModal = () => {
+    resetModal.classList.remove('active');
+    resetModal.setAttribute('aria-hidden', 'true');
+    if (resetForm) resetForm.reset();
+  };
+
+  if (forgotPasswordBtn) {
+    forgotPasswordBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      openModal();
+    });
+  }
+
+  if (closeResetModal) {
+    closeResetModal.addEventListener('click', closeModal);
+  }
+
+  // Close modal when tapping outside card
+  window.addEventListener('click', (e) => {
+    if (e.target === resetModal) {
+      closeModal();
+    }
+  });
+
+  // Handle Reset Form Submit
+  if (resetForm) {
+    resetForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('resetEmail').value;
+      
+      alert(`Password reset link successfully sent to: ${email}`);
+      closeModal();
+    });
+  }
+
+  // --- Audio Upload & Playback (iOS Compatible) ---
   if (audioInput && audioPlayer) {
     audioInput.addEventListener('change', (event) => {
       const files = event.target.files;
 
       if (files && files.length > 0) {
-        const selectedFile = files[0];
+        const file = files[0];
 
-        // Generate temporary Blob URL compatible with Mobile Safari
-        const fileURL = URL.createObjectURL(selectedFile);
-
-        audioPlayer.src = fileURL;
-        nowPlaying.textContent = `Playing: ${selectedFile.name}`;
+        // Create object URL compatible with Safari / WebKit
+        const audioUrl = URL.createObjectURL(file);
         
+        audioPlayer.src = audioUrl;
+        nowPlayingTitle.textContent = file.name;
+
         // Auto play track after loading
-        audioPlayer.play().catch(err => {
-          console.log("Autoplay prevented by iOS user interaction policy:", err);
+        audioPlayer.play().catch((err) => {
+          console.log("Autoplay deferred until user interaction:", err);
         });
       }
-    });
-  }
-
-  // Reset Modal Logic
-  const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-  const resetModal = document.getElementById('resetModal');
-  const closeResetModal = document.getElementById('closeResetModal');
-  const resetForm = document.getElementById('resetForm');
-
-  if (forgotPasswordLink && resetModal) {
-    forgotPasswordLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      resetModal.style.display = 'block';
-    });
-  }
-
-  if (closeResetModal && resetModal) {
-    closeResetModal.addEventListener('click', () => {
-      resetModal.style.display = 'none';
-    });
-  }
-
-  window.addEventListener('click', (e) => {
-    if (e.target === resetModal) {
-      resetModal.style.display = 'none';
-    }
-  });
-
-  if (resetForm) {
-    resetForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const emailVal = document.getElementById('resetEmail').value;
-      alert(`Password reset link sent to: ${emailVal}`);
-      resetModal.style.display = 'none';
-      resetForm.reset();
     });
   }
 });
