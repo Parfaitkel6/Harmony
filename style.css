@@ -28,6 +28,7 @@ body {
     padding-top: 20px;
     gap: 20px;
     flex-shrink: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .nav-icon {
@@ -48,6 +49,40 @@ body {
 .nav-icon.active, .nav-icon:hover {
     background: rgba(255, 255, 255, 0.15);
     color: #ffffff;
+}
+
+/* Sub-Sidebar for Views */
+.sub-sidebar {
+    width: 220px;
+    background-color: #16161a;
+    padding: 20px 15px;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+    overflow-y: auto;
+}
+
+.view-panel {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.view-panel.active {
+    display: flex;
+}
+
+.view-panel h3 {
+    font-size: 1.1rem;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.panel-desc {
+    font-size: 0.85rem;
+    color: #9ba1a6;
+    line-height: 1.4;
 }
 
 /* Main Content Area */
@@ -202,14 +237,39 @@ body {
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
     transition: background 0.2s;
+}
+
+#playlist li:hover {
+    background: #22222a;
+}
+
+#playlist li img.track-thumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.playlist-item-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.playlist-item-title {
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-#playlist li:hover {
-    background: #22222a;
+.playlist-item-artist {
+    font-size: 0.75rem;
+    color: #9ba1a6;
 }
 
 /* Floating Bottom Player Bar */
@@ -247,6 +307,13 @@ body {
     justify-content: center;
     color: #9ba1a6;
     flex-shrink: 0;
+    overflow: hidden;
+}
+
+.thumb-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .track-info {
@@ -261,6 +328,12 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.track-artist {
+    font-size: 0.75rem !important;
+    color: #9ba1a6;
+    font-weight: normal !important;
 }
 
 .player-center {
@@ -368,6 +441,12 @@ body {
 }
 
 /* Responsive Adaptive Layout Queries */
+@media (max-width: 768px) {
+    .sub-sidebar {
+        display: none; /* Hide secondary sidebar on smaller screens or make collapsible */
+    }
+}
+
 @media (max-width: 600px) {
     .app-container {
         flex-direction: column-reverse;
@@ -386,6 +465,7 @@ body {
         left: 0;
         z-index: 101;
         border-top: 1px solid rgba(255, 255, 255, 0.05);
+        border-right: none;
     }
     
     .main-content {

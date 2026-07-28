@@ -42,9 +42,73 @@ const audioFileInput = document.getElementById('audio-file-input');
 const playlist = document.getElementById('playlist');
 const audioElement = document.getElementById('audio-element');
 const currentTitle = document.getElementById('current-title');
+const currentArtist = document.getElementById('current-artist');
+const trackThumbnail = document.getElementById('track-thumbnail');
 const playBtn = document.getElementById('play-btn');
 const pauseBtn = document.getElementById('pause-btn');
 const featuredPlayBtn = document.getElementById('featured-play-btn');
+const seekBar = document.getElementById('seek-bar');
+const currentTimeEl = document.getElementById('current-time');
+const totalDurationEl = document.getElementById('total-duration');
+
+// Sidebar Toggles Navigation
+const navIcons = document.querySelectorAll('.nav-icon');
+const viewPanels = document.querySelectorAll('.view-panel');
+
+navIcons.forEach(icon => {
+    icon.addEventListener('click', () => {
+        navIcons.forEach(btn => btn.classList.remove('active'));
+        icon.classList.add('active');
+        
+        const targetViewId = icon.getAttribute('data-target');
+        viewPanels.forEach(panel => {
+            if(panel.id === targetViewId) {
+                panel.classList.add('active');
+            } else {
+                panel.classList.remove('active');
+            }
+        });
+    });
+});
+
+// Default Tracks for All Accounts
+const defaultTracks = [
+    {
+        title: "Harmony Default Track",
+        artist: "Harmony Official",
+        cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100&auto=format&fit=crop&q=80",
+        url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+    }
+];
+
+function loadDefaultPlaylist() {
+    playlist.innerHTML = '';
+    defaultTracks.forEach(track => {
+        appendTrackToPlaylist(track.title, track.artist, track.cover, track.url);
+    });
+}
+
+function appendTrackToPlaylist(title, artist, coverUrl, audioUrl) {
+    const li = document.createElement('li');
+    li.innerHTML = `
+        <img src="${coverUrl}" class="track-thumb" alt="Cover">
+        <div class="playlist-item-info">
+            <span class="playlist-item-title">${title}</span>
+            <span class="playlist-item-artist">${artist}</span>
+        </div>
+    `;
+    li.addEventListener('click', () => {
+        audioElement.src = audioUrl;
+        currentTitle.textContent = title;
+        currentArtist.textContent = artist;
+        trackThumbnail.innerHTML = `<img src="${coverUrl}" alt="Cover">`;
+        audioElement.play();
+    });
+    playlist.appendChild(li);
+}
+
+// Initialize default playlist on load
+loadDefaultPlaylist();
 
 // Authentication State Observer
 onAuthStateChanged(auth, (user) => {
@@ -62,6 +126,8 @@ onAuthStateChanged(auth, (user) => {
         logoutBtn.style.display = 'none';
         loginBtn.textContent = 'U';
     }
+    // Ensure default tracks persist for any session/account
+    loadDefaultPlaylist();
 });
 
 // Modal Events
@@ -108,7 +174,7 @@ logoutBtn.addEventListener('click', async () => {
     await signOut(auth);
 });
 
-// File Upload & Cloud Storage Handler
+// Universal Audio File Importation Handler (Accepts any audio extension/type)
 audioFileInput.addEventListener('change', async (e) => {
     const files = e.target.files;
     if (!files.length) return;
@@ -119,21 +185,22 @@ audioFileInput.addEventListener('change', async (e) => {
             const snapshot = await uploadBytes(storageRef, file);
             const downloadURL = await getDownloadURL(snapshot.ref);
 
-            const li = document.createElement('li');
-            li.innerHTML = `<i class="fa-solid fa-music"></i> ${file.name}`;
-            li.addEventListener('click', () => {
-                audioElement.src = downloadURL;
-                currentTitle.textContent = file.name;
-                audioElement.play();
-            });
-            playlist.appendChild(li);
+            const title = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+            const artist = auth.currentUser && auth.currentUser.displayName ? auth.currentUser.displayName : "Uploaded Track";
+            const cover = "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=100&auto=format&fit=crop&q=80";
+
+            appendTrackToPlaylist(title, artist, cover, downloadURL);
         } catch (error) {
             console.error("Error uploading file: ", error);
+            // Fallback for local testing without active storage rules or offline selection
+            const localURL = URL.createObjectURL(file);
+            const title = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+            appendTrackToPlaylist(title, "Local Artist", "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=100&auto=format&fit=crop&q=80", localURL);
         }
     }
 });
 
-// Player Controls
+// Player Controls & Progress Syncing
 playBtn.addEventListener('click', () => {
     audioElement.play();
 });
@@ -142,6 +209,36 @@ pauseBtn.addEventListener('click', () => {
     audioElement.pause();
 });
 
+audioElement.addEventListener('timeupdate', () => {
+    if (audioElement.duration) {
+        const progressPercent = (audioElement.currentTime / audioElement.duration) * 100;
+        seekBar.value = progressPercent;
+        
+        let currentMinutes = Math.floor(audioElement.currentTime / 60);
+        let currentSeconds = Math.floor(audioElement.currentTime % 60);
+        if (currentSeconds < 10) currentSeconds = "0" + currentSeconds;
+        currentTimeEl.textContent = `${currentMinutes}:${currentSeconds}`;
+
+        let totalMinutes = Math.floor(audioElement.duration / 60);
+        let totalSeconds = Math.floor(audioElement.duration % 60);
+        if (totalSeconds < 10) totalSeconds = "0" + totalSeconds;
+        totalDurationEl.textContent = `${totalMinutes}:${totalSeconds}`;
+    }
+});
+
+seekBar.addEventListener('input', () => {
+    if (audioElement.duration) {
+        const seekTime = (seekBar.value / 100) * audioElement.duration;
+        audioElement.currentTime = seekTime;
+    }
+});
+
 featuredPlayBtn.addEventListener('click', () => {
-    alert("Upload your tracks or select one from the Trending list below to play!");
+    if(defaultTracks.length > 0) {
+        audioElement.src = defaultTracks[0].url;
+        currentTitle.textContent = defaultTracks[0].title;
+        currentArtist.textContent = defaultTracks[0].artist;
+        trackThumbnail.innerHTML = `<img src="${defaultTracks[0].cover}" alt="Cover">`;
+        audioElement.play();
+    }
 });
