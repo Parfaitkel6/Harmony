@@ -8,53 +8,81 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <h2>Harmony</h2>
-            <ul>
-                <li class="active">Home</li>
-                <li>Search</li>
-                <li>Your Library</li>
-            </ul>
+        <!-- Left Icon Navigation Bar -->
+        <aside class="icon-sidebar">
+            <button class="nav-icon active" title="Feed">⇄</button>
+            <button class="nav-icon" title="Explore">🧭</button>
+            <button class="nav-icon" title="Library">💿</button>
+            <button class="nav-icon" title="Record">🎤</button>
+            <button class="nav-icon" title="Community">👥</button>
         </aside>
 
-        <!-- Main Content Section -->
+        <!-- Main Dashboard Content -->
         <main class="main-content">
-            <header>
+            <!-- Top Bar with Search & Profile/Auth -->
+            <header class="top-bar">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search for songs, artists, ...">
+                </div>
                 <div id="auth-section">
-                    <button id="login-btn">Login / Sign Up</button>
+                    <button id="login-btn" class="profile-avatar-btn">U</button>
                     <span id="user-display" style="display: none;"></span>
                     <button id="logout-btn" style="display: none;">Logout</button>
                 </div>
             </header>
             
-            <section class="hero">
-                <h1>Welcome to Harmony</h1>
-                <p>Play and manage your favorite tracks</p>
-                <div class="upload-container">
-                    <label for="audio-file-input" class="upload-label">Upload Music (.mp3)</label>
-                    <input type="file" id="audio-file-input" accept="audio/*" multiple style="display: none;">
+            <!-- Featured Album Card -->
+            <section class="featured-card">
+                <div class="featured-text">
+                    <h2>Featured Album</h2>
+                    <p>Listen to the latest hits in high fidelity.</p>
+                    <button id="featured-play-btn" class="play-now-btn">Play Now</button>
                 </div>
             </section>
 
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <label for="audio-file-input" class="upload-label">+ Upload MP3 Tracks</label>
+                <input type="file" id="audio-file-input" accept="audio/*" multiple style="display: none;">
+            </section>
+
+            <!-- Trending / Playlist Section -->
             <section class="playlist-section">
-                <h2>Your Playlist</h2>
+                <h2>Trending Now</h2>
                 <ul id="playlist">
-                    <!-- Dynamic tracks will appear here -->
+                    <!-- Dynamic uploaded tracks appear here -->
                 </ul>
             </section>
         </main>
     </div>
 
-    <!-- Persistent Music Player Bar -->
+    <!-- Floating Bottom Player Bar -->
     <footer class="player-bar">
-        <div class="track-info">
-            <span id="current-title">No track selected</span>
+        <div class="player-left">
+            <div id="track-thumbnail" class="thumb-box"></div>
+            <div class="track-info">
+                <span id="current-title">N.</span>
+            </div>
         </div>
-        <div class="player-controls">
-            <button id="play-btn">Play</button>
-            <button id="pause-btn">Pause</button>
+        
+        <div class="player-center">
+            <div class="controls-row">
+                <button id="prev-btn">⏮</button>
+                <button id="play-btn">▶</button>
+                <button id="pause-btn">⏸</button>
+                <button id="next-btn">⏭</button>
+            </div>
+            <div class="progress-row">
+                <span id="current-time">0:00</span>
+                <input type="range" id="seek-bar" value="0" max="100">
+                <span id="total-duration">0:00</span>
+            </div>
         </div>
+
+        <div class="player-right">
+            <span class="volume-icon">🔊</span>
+        </div>
+
         <audio id="audio-element"></audio>
     </footer>
 
@@ -62,8 +90,8 @@
     <div id="auth-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <span id="close-modal">&times;</span>
-            <h3>Authentication</h3>
-            <input type="text" id="profile-name" placeholder="Profile Name (Optional for Signup)">
+            <h3>Welcome to Harmony</h3>
+            <input type="text" id="profile-name" placeholder="Profile Name (Optional)">
             <input type="email" id="auth-email" placeholder="Email">
             <input type="password" id="auth-password" placeholder="Password">
             <button id="submit-signup">Sign Up</button>

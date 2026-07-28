@@ -44,6 +44,7 @@ const audioElement = document.getElementById('audio-element');
 const currentTitle = document.getElementById('current-title');
 const playBtn = document.getElementById('play-btn');
 const pauseBtn = document.getElementById('pause-btn');
+const featuredPlayBtn = document.getElementById('featured-play-btn');
 
 // Authentication State Observer
 onAuthStateChanged(auth, (user) => {
@@ -51,13 +52,15 @@ onAuthStateChanged(auth, (user) => {
         loginBtn.style.display = 'none';
         userDisplay.style.display = 'inline';
         logoutBtn.style.display = 'inline';
-        // Display custom profile name if set, otherwise fallback to email
-        userDisplay.textContent = user.displayName ? user.displayName : user.email;
+        const displayName = user.displayName ? user.displayName : user.email;
+        userDisplay.textContent = displayName;
+        loginBtn.textContent = displayName.charAt(0).toUpperCase();
         authModal.style.display = 'none';
     } else {
-        loginBtn.style.display = 'inline';
+        loginBtn.style.display = 'flex';
         userDisplay.style.display = 'none';
         logoutBtn.style.display = 'none';
+        loginBtn.textContent = 'U';
     }
 });
 
@@ -76,7 +79,6 @@ submitSignup.addEventListener('click', async () => {
         const userCredential = await createUserWithEmailAndPassword(auth, authEmail.value, authPassword.value);
         const user = userCredential.user;
 
-        // If a profile name was entered, update the user profile
         if (profileNameInput.value.trim() !== "") {
             await updateProfile(user, {
                 displayName: profileNameInput.value.trim()
@@ -114,11 +116,9 @@ audioFileInput.addEventListener('change', async (e) => {
     for (let file of files) {
         const storageRef = ref(storage, 'tracks/' + file.name);
         try {
-            // Upload file to Firebase Cloud Storage
             const snapshot = await uploadBytes(storageRef, file);
             const downloadURL = await getDownloadURL(snapshot.ref);
 
-            // Add track to Playlist UI
             const li = document.createElement('li');
             li.textContent = file.name;
             li.addEventListener('click', () => {
@@ -140,4 +140,8 @@ playBtn.addEventListener('click', () => {
 
 pauseBtn.addEventListener('click', () => {
     audioElement.pause();
+});
+
+featuredPlayBtn.addEventListener('click', () => {
+    alert("Upload your tracks or select one from the Trending list below to play!");
 });

@@ -2,11 +2,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 body {
-    background-color: #121212;
+    background-color: #121216;
     color: #ffffff;
     height: 100vh;
     overflow: hidden;
@@ -14,123 +14,201 @@ body {
 
 .app-container {
     display: flex;
-    height: calc(100vh - 90px);
+    height: calc(100vh - 100px);
     width: 100vw;
 }
 
-/* Sidebar Responsive Layout */
-.sidebar {
-    width: 240px;
-    background-color: #000000;
-    padding: 20px;
+/* Left Icon Sidebar */
+.icon-sidebar {
+    width: 70px;
+    background-color: #18181c;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 20px;
+    gap: 20px;
     flex-shrink: 0;
 }
 
-.sidebar h2 {
-    color: #1db954;
-    margin-bottom: 30px;
-}
-
-.sidebar ul li {
-    list-style: none;
-    padding: 10px 0;
-    color: #b3b3b3;
+.nav-icon {
+    background: rgba(255, 255, 255, 0.05);
+    border: none;
+    color: #9ba1a6;
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    font-size: 1.2rem;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
 }
 
-.sidebar ul li.active, .sidebar ul li:hover {
+.nav-icon.active, .nav-icon:hover {
+    background: rgba(255, 255, 255, 0.15);
     color: #ffffff;
 }
 
 /* Main Content Area */
 .main-content {
     flex: 1;
-    background: linear-gradient(to bottom, #282828, #121212);
-    padding: 20px;
+    background: #121216;
+    padding: 20px 30px;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    gap: 20px;
 }
 
-header {
+/* Top Bar */
+.top-bar {
     display: flex;
-    justify-content: flex-end;
-    margin-bottom: 20px;
-    flex-shrink: 0;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 }
 
-header button {
-    background-color: #1db954;
+.search-container {
+    flex: 1;
+    max-width: 600px;
+}
+
+#search-input {
+    width: 100%;
+    padding: 12px 20px;
+    background: #1e1e24;
+    border: none;
+    border-radius: 30px;
+    color: white;
+    font-size: 0.95rem;
+    outline: none;
+}
+
+#auth-section {
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-avatar-btn {
+    background: #ff7a45;
     color: white;
     border: none;
-    padding: 8px 16px;
-    border-radius: 20px;
-    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.hero {
-    margin-bottom: 30px;
-    flex-shrink: 0;
+#user-display {
+    font-size: 0.9rem;
+    color: #e0e0e0;
 }
 
-.hero h1 {
-    font-size: clamp(1.5rem, 3vw, 2.5rem);
-    margin-bottom: 10px;
+#logout-btn {
+    background: #2a2a32;
+    border: none;
+    color: #ff5555;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+/* Featured Album Card */
+.featured-card {
+    background: linear-gradient(135deg, #ff7a45 0%, #3e1f47 100%);
+    border-radius: 20px;
+    padding: 30px;
+    width: 100%;
+    max-width: 700px;
+}
+
+.featured-text h2 {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.featured-text p {
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 20px;
+}
+
+.play-now-btn {
+    background: #ffffff;
+    color: #121216;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.upload-section {
+    margin-top: 5px;
 }
 
 .upload-label {
     display: inline-block;
-    background-color: #1db954;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 20px;
+    background: #2a2a32;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 10px;
     cursor: pointer;
-    font-weight: bold;
-    margin-top: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
 }
 
 .upload-label:hover {
-    background-color: #1ed760;
+    background: #363640;
 }
 
-.playlist-section {
-    flex: 1;
-    overflow-y: auto;
-}
-
+/* Playlist / Trending Section */
 .playlist-section h2 {
-    margin-bottom: 15px;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
 }
 
 #playlist {
     list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 #playlist li {
-    padding: 12px;
-    background: rgba(255, 255, 255, 0.1);
-    margin-bottom: 8px;
-    border-radius: 6px;
+    padding: 12px 16px;
+    background: #18181c;
+    border-radius: 10px;
     cursor: pointer;
+    font-size: 0.95krem;
+    transition: background 0.2s;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 #playlist li:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: #22222a;
 }
 
-/* Persistent Player Bar */
+/* Floating Bottom Player Bar */
 .player-bar {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 90px;
-    background-color: #181818;
-    border-top: 1px solid #282828;
+    bottom: 10px;
+    left: 15px;
+    right: 15px;
+    height: 80px;
+    background-color: #18181c;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -138,26 +216,66 @@ header button {
     z-index: 100;
 }
 
-.track-info {
-    width: 30%;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.player-controls {
+.player-left {
     display: flex;
     align-items: center;
+    gap: 12px;
+    width: 25%;
 }
 
-.player-controls button {
+.thumb-box {
+    width: 45px;
+    height: 45px;
+    background: #2a2a32;
+    border-radius: 8px;
+}
+
+.track-info span {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.player-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 45%;
+}
+
+.controls-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.controls-row button {
     background: none;
     border: none;
     color: white;
-    font-size: 1rem;
-    margin: 0 15px;
+    font-size: 1.1rem;
     cursor: pointer;
-    font-weight: bold;
+}
+
+.progress-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    font-size: 0.75rem;
+    color: #9ba1a6;
+}
+
+.progress-row input[type="range"] {
+    flex: 1;
+    accent-color: #ff7a45;
+    cursor: pointer;
+}
+
+.player-right {
+    width: 20%;
+    display: flex;
+    justify-content: flex-end;
 }
 
 /* Modal Overlay */
@@ -167,7 +285,7 @@ header button {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.8);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -175,65 +293,41 @@ header button {
 }
 
 .modal-content {
-    background: #282828;
+    background: #18181c;
     padding: 30px;
-    border-radius: 12px;
+    border-radius: 16px;
     display: flex;
     flex-direction: column;
     gap: 15px;
     width: 90%;
-    max-width: 350px;
+    max-width: 340px;
     position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 #close-modal {
     position: absolute;
     top: 15px;
     right: 20px;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     cursor: pointer;
+    color: #9ba1a6;
 }
 
 .modal-content input {
     padding: 12px;
-    border-radius: 6px;
+    border-radius: 8px;
     border: none;
-    background: #3e3e3e;
+    background: #25252d;
     color: white;
 }
 
 .modal-content button {
     padding: 12px;
-    background: #1db954;
+    background: #ff7a45;
     color: white;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
-}
-
-.modal-content button:hover {
-    background: #1ed760;
-}
-
-/* Media Query for Smaller Displays / Mobile Devices */
-@media (max-width: 768px) {
-    .app-container {
-        flex-direction: column;
-    }
-    .sidebar {
-        width: 100%;
-        height: auto;
-        padding: 10px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .sidebar h2 {
-        margin-bottom: 0;
-    }
-    .sidebar ul {
-        display: flex;
-        gap: 15px;
-    }
 }
