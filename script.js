@@ -120,7 +120,7 @@ audioFileInput.addEventListener('change', async (e) => {
             const downloadURL = await getDownloadURL(snapshot.ref);
 
             const li = document.createElement('li');
-            li.textContent = file.name;
+            li.innerHTML = `<i class="fa-solid fa-music"></i> ${file.name}`;
             li.addEventListener('click', () => {
                 audioElement.src = downloadURL;
                 currentTitle.textContent = file.name;

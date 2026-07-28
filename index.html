@@ -5,16 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harmony - Music Player</title>
     <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome for Professional Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="app-container">
-        <!-- Left Icon Navigation Bar -->
+        <!-- Left Professional Icon Sidebar -->
         <aside class="icon-sidebar">
-            <button class="nav-icon active" title="Feed">⇄</button>
-            <button class="nav-icon" title="Explore">🧭</button>
-            <button class="nav-icon" title="Library">💿</button>
-            <button class="nav-icon" title="Record">🎤</button>
-            <button class="nav-icon" title="Community">👥</button>
+            <button class="nav-icon active" title="Feed"><i class="fa-solid fa-house"></i></button>
+            <button class="nav-icon" title="Explore"><i class="fa-solid fa-compass"></i></button>
+            <button class="nav-icon" title="Library"><i class="fa-solid fa-compact-disc"></i></button>
+            <button class="nav-icon" title="Record"><i class="fa-solid fa-microphone-lines"></i></button>
+            <button class="nav-icon" title="Community"><i class="fa-solid fa-user-group"></i></button>
         </aside>
 
         <!-- Main Dashboard Content -->
@@ -22,12 +24,13 @@
             <!-- Top Bar with Search & Profile/Auth -->
             <header class="top-bar">
                 <div class="search-container">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
                     <input type="text" id="search-input" placeholder="Search for songs, artists, ...">
                 </div>
                 <div id="auth-section">
                     <button id="login-btn" class="profile-avatar-btn">U</button>
                     <span id="user-display" style="display: none;"></span>
-                    <button id="logout-btn" style="display: none;">Logout</button>
+                    <button id="logout-btn" style="display: none;"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
                 </div>
             </header>
             
@@ -36,19 +39,19 @@
                 <div class="featured-text">
                     <h2>Featured Album</h2>
                     <p>Listen to the latest hits in high fidelity.</p>
-                    <button id="featured-play-btn" class="play-now-btn">Play Now</button>
+                    <button id="featured-play-btn" class="play-now-btn"><i class="fa-solid fa-play"></i> Play Now</button>
                 </div>
             </section>
 
             <!-- Upload Section -->
             <section class="upload-section">
-                <label for="audio-file-input" class="upload-label">+ Upload MP3 Tracks</label>
+                <label for="audio-file-input" class="upload-label"><i class="fa-solid fa-cloud-arrow-up"></i> Upload MP3 Tracks</label>
                 <input type="file" id="audio-file-input" accept="audio/*" multiple style="display: none;">
             </section>
 
             <!-- Trending / Playlist Section -->
             <section class="playlist-section">
-                <h2>Trending Now</h2>
+                <h2><i class="fa-solid fa-fire text-accent"></i> Trending Now</h2>
                 <ul id="playlist">
                     <!-- Dynamic uploaded tracks appear here -->
                 </ul>
@@ -59,7 +62,7 @@
     <!-- Floating Bottom Player Bar -->
     <footer class="player-bar">
         <div class="player-left">
-            <div id="track-thumbnail" class="thumb-box"></div>
+            <div id="track-thumbnail" class="thumb-box"><i class="fa-solid fa-music"></i></div>
             <div class="track-info">
                 <span id="current-title">N.</span>
             </div>
@@ -67,10 +70,10 @@
         
         <div class="player-center">
             <div class="controls-row">
-                <button id="prev-btn">⏮</button>
-                <button id="play-btn">▶</button>
-                <button id="pause-btn">⏸</button>
-                <button id="next-btn">⏭</button>
+                <button id="prev-btn" title="Previous"><i class="fa-solid fa-backward-step"></i></button>
+                <button id="play-btn" title="Play"><i class="fa-solid fa-play"></i></button>
+                <button id="pause-btn" title="Pause"><i class="fa-solid fa-pause"></i></button>
+                <button id="next-btn" title="Next"><i class="fa-solid fa-forward-step"></i></button>
             </div>
             <div class="progress-row">
                 <span id="current-time">0:00</span>
@@ -80,7 +83,7 @@
         </div>
 
         <div class="player-right">
-            <span class="volume-icon">🔊</span>
+            <span class="volume-icon"><i class="fa-solid fa-volume-high"></i></span>
         </div>
 
         <audio id="audio-element"></audio>
@@ -90,7 +93,7 @@
     <div id="auth-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <span id="close-modal">&times;</span>
-            <h3>Welcome to Harmony</h3>
+            <h3><i class="fa-solid fa-headphones-simple"></i> Welcome to Harmony</h3>
             <input type="text" id="profile-name" placeholder="Profile Name (Optional)">
             <input type="email" id="auth-email" placeholder="Email">
             <input type="password" id="auth-password" placeholder="Password">
