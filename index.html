@@ -110,7 +110,7 @@
             background: var(--body-overlay);
             backdrop-filter: blur(24px);
             z-index: 999999;
-            display: flex; align-items: center; justify-content: center;
+            display: none;
             padding: 20px;
         }
         .auth-card {
@@ -164,19 +164,70 @@
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
             height: 100%;
         }
-        .sidebar.collapsed { width: 76px; }
-        .sidebar.collapsed .brand-info, 
-        .sidebar.collapsed .nav-item span { display: none; }
-        .sidebar.collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
+       .sidebar.collapsed { 
+    width: 76px; 
+}
 
+/* Hide text labels and branding details */
+.sidebar.collapsed .brand-info, 
+.sidebar.collapsed .nav-item span { 
+    display: none !important; 
+}
+
+/* Center header and toggle button */
+.sidebar.collapsed .sidebar-header { 
+    justify-content: center; 
+    padding: 18px 0; 
+    width: 100%;
+}
+
+/* Center icons within navigation items */
+.sidebar.collapsed .nav-item { 
+    justify-content: center; 
+    padding: 12px 0; 
+    width: 100%;
+    border-radius: 12px;
+}
+
+/* Ensure SVGs remain perfectly centered without margins */
+.sidebar.collapsed .nav-item svg { 
+    margin: 0; 
+}
         .sidebar-header { display: flex; align-items: center; gap: 12px; padding: 18px 20px; }
         .brand-info { display: flex; flex-direction: column; }
         .brand-name { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
         .brand-tier { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; color: var(--accent); letter-spacing: 0.8px; }
         
-        .icon-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 8px; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
-        .icon-btn:hover { color: var(--text-primary); background: var(--liquid-bg); }
+       .icon-btn { 
+    background: none; 
+    border: none; 
+    color: var(--text-secondary); 
+    font-size: 1.05rem; 
+    cursor: pointer; 
+    padding: 6px; 
+    border-radius: 8px; 
+    transition: var(--transition); 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center; 
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+}
 
+.icon-btn:hover { 
+    color: var(--text-primary); 
+    background: var(--liquid-bg); 
+}
+
+.icon-btn:active {
+    transform: scale(0.95);
+}
+
+/* Ensures SVG or icon children don't hijack button click events */
+.icon-btn * {
+    pointer-events: none;
+}
         .sidebar-nav { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
         .nav-item { 
             display: flex; align-items: center; gap: 14px; padding: 10px 14px; 
