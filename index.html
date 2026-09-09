@@ -1,1278 +1,144 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Harmony | Enterprise Audio Workspace</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        :root {
-            --bg-color: #0c0d12;
-            --bg-url: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2000&auto=format&fit=crop');
-            --body-overlay: rgba(10, 11, 16, 0.88);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --accent: #2563eb;
-            --accent-glow: rgba(37, 99, 235, 0.25);
-            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --liquid-bg: rgba(255, 255, 255, 0.04);
-            --liquid-border: rgba(255, 255, 255, 0.08);
-            --liquid-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 32px rgba(0, 0, 0, 0.4);
-            --sidebar-bg: rgba(12, 13, 18, 0.8);
-            --main-bg: rgba(255, 255, 255, 0.01);
-            --main-border: rgba(255, 255, 255, 0.05);
-            --dropdown-bg: rgba(15, 17, 23, 0.96);
-        }
-
-        body.theme-light {
-            --bg-color: #f1f5f9;
-            --bg-url: url('https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=2000&auto=format&fit=crop');
-            --body-overlay: rgba(241, 245, 249, 0.9);
-            --text-primary: #0f172a;
-            --text-secondary: #64748b;
-            --accent: #0284c7;
-            --accent-glow: rgba(2, 132, 199, 0.2);
-            --liquid-bg: rgba(0, 0, 0, 0.03);
-            --liquid-border: rgba(0, 0, 0, 0.08);
-            --liquid-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 10px 25px rgba(0, 0, 0, 0.05);
-            --sidebar-bg: rgba(255, 255, 255, 0.85);
-            --main-bg: rgba(0, 0, 0, 0.005);
-            --main-border: rgba(0, 0, 0, 0.06);
-            --dropdown-bg: rgba(255, 255, 255, 0.98);
-        }
-
-        body.theme-cyberpunk {
-            --bg-color: #030712;
-            --bg-url: url('https://images.unsplash.com/photo-1508739773434-c26b3d09e071?q=80&w=2000&auto=format&fit=crop');
-            --body-overlay: rgba(3, 7, 18, 0.92);
-            --text-primary: #38bdf8;
-            --text-secondary: #cbd5e1;
-            --accent: #0ea5e9;
-            --accent-glow: rgba(14, 165, 233, 0.35);
-            --liquid-bg: rgba(14, 165, 233, 0.06);
-            --liquid-border: rgba(56, 189, 248, 0.2);
-            --liquid-shadow: inset 0 0 15px rgba(14, 165, 233, 0.08), 0 12px 35px rgba(3, 7, 18, 0.6);
-            --sidebar-bg: rgba(7, 13, 26, 0.85);
-            --main-bg: rgba(14, 165, 233, 0.008);
-            --main-border: rgba(56, 189, 248, 0.12);
-            --dropdown-bg: rgba(7, 13, 26, 0.98);
-        }
-
-        body.theme-sunset {
-            --bg-color: #180d17;
-            --bg-url: url('https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?q=80&w=2000&auto=format&fit=crop');
-            --body-overlay: rgba(24, 13, 23, 0.9);
-            --text-primary: #fff1f2;
-            --text-secondary: #fda4af;
-            --accent: #e11d48;
-            --accent-glow: rgba(225, 29, 72, 0.25);
-            --liquid-bg: rgba(225, 29, 72, 0.05);
-            --liquid-border: rgba(244, 63, 94, 0.18);
-            --liquid-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 12px 35px rgba(0, 0, 0, 0.5);
-            --sidebar-bg: rgba(30, 14, 28, 0.8);
-            --main-bg: rgba(255, 255, 255, 0.01);
-            --main-border: rgba(244, 63, 94, 0.12);
-            --dropdown-bg: rgba(28, 12, 26, 0.98);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-
-        body {
-            background: var(--bg-url) no-repeat center center fixed;
-            background-size: cover;
-            color: var(--text-primary);
-            height: 100vh;
-            overflow: hidden;
-            padding: 12px;
-            transition: background 0.5s ease, color 0.3s ease;
-        }
-
-        body::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--body-overlay); z-index: -1;
-            transition: background 0.5s ease;
-        }
-
-        .liquid-glass-effect {
-            background: var(--liquid-bg);
-            backdrop-filter: blur(16px) saturate(160%);
-            -webkit-backdrop-filter: blur(16px) saturate(160%);
-            border: 1px solid var(--liquid-border);
-            border-radius: 16px;
-            box-shadow: var(--liquid-shadow);
-            transform: translateZ(0);
-        }
-
-        /* Authentication Overlay Screen */
-        .auth-overlay-container {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--body-overlay);
-            backdrop-filter: blur(24px);
-            z-index: 999999;
-            display: flex; align-items: center; justify-content: center;
-            padding: 20px;
-        }
-        .auth-card {
-            width: 100%; max-width: 420px; padding: 32px;
-            border-radius: 24px; display: flex; flex-direction: column; gap: 20px;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
-            border: 1px solid var(--liquid-border);
-            background: var(--dropdown-bg);
-            animation: dropdownSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        @keyframes dropdownSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .auth-header { text-align: center; display: flex; flex-direction: column; gap: 6px; }
-        .auth-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.4px; }
-        .auth-subtitle { font-size: 0.85rem; color: var(--text-secondary); }
-
-        .auth-form { display: flex; flex-direction: column; gap: 14px; }
-        .auth-input-group { display: flex; flex-direction: column; gap: 6px; text-align: left; }
-        .auth-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
-        .auth-input { background: var(--liquid-bg); border: 1px solid var(--liquid-border); color: var(--text-primary); padding: 11px 14px; border-radius: 12px; outline: none; font-size: 0.9rem; transition: border-color 0.2s; }
-        .auth-input:focus { border-color: var(--accent); }
-
-        .auth-btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.95rem; box-shadow: 0 4px 16px var(--accent-glow); transition: opacity 0.2s; }
-        .auth-btn:hover { opacity: 0.92; }
-        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        .auth-footer-links { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; margin-top: 4px; }
-        .auth-link { color: var(--accent); cursor: pointer; text-decoration: none; font-weight: 500; }
-        .auth-link:hover { text-decoration: underline; }
-
-        .guest-banner {
-            background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.3); color: #facc15;
-            padding: 10px 14px; border-radius: 10px; font-size: 0.78rem; text-align: center; line-height: 1.4;
-        }
-        .auth-error-banner {
-            background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171;
-            padding: 10px 14px; border-radius: 10px; font-size: 0.78rem; text-align: center; line-height: 1.4; display: none;
-        }
-
-        .app-layout {
-            display: flex;
-            height: calc(100vh - 92px);
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .sidebar {
-            width: 260px;
-            background: var(--sidebar-bg);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--liquid-border);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            transition: var(--transition);
-            overflow: hidden;
-            z-index: 10;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
-            height: 100%;
-        }
-        .sidebar.collapsed { width: 76px; }
-        .sidebar.collapsed .brand-info,
-        .sidebar.collapsed .nav-item span { display: none; }
-        .sidebar.collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
-
-        .sidebar-header { display: flex; align-items: center; gap: 12px; padding: 18px 20px; }
-        .brand-info { display: flex; flex-direction: column; }
-        .brand-name { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
-        .brand-tier { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; color: var(--accent); letter-spacing: 0.8px; }
-
-        .icon-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 8px; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
-        .icon-btn:hover { color: var(--text-primary); background: var(--liquid-bg); }
-
-        .sidebar-nav { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
-        .nav-item {
-            display: flex; align-items: center; gap: 14px; padding: 10px 14px;
-            background: transparent; border: none; color: var(--text-secondary);
-            cursor: pointer; border-radius: 12px; font-size: 0.88rem; font-weight: 500;
-            transition: var(--transition); white-space: nowrap; text-align: left;
-        }
-        .nav-item:hover { background: var(--liquid-bg); color: var(--text-primary); }
-        .nav-item.active { background: var(--accent); color: white; box-shadow: 0 4px 16px var(--accent-glow); font-weight: 600; }
-        .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-        .nav-item.active svg { stroke: white; }
-
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 10px 24px;
-            overflow: hidden;
-            position: relative;
-            background: var(--main-bg);
-            border: 1px solid var(--main-border);
-            border-radius: 20px;
-            backdrop-filter: blur(8px);
-            height: 100%;
-        }
-
-        .top-nav { display: flex; justify-content: center; align-items: center; gap: 20px; position: relative; margin-bottom: 16px; z-index: 50; flex-shrink: 0; }
-        .search-container { display: flex; align-items: center; gap: 10px; padding: 8px 16px; width: 420px; border-radius: 24px; }
-        .search-container svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; flex-shrink: 0; }
-        .search-container input { background: none; border: none; outline: none; color: var(--text-primary); width: 100%; font-size: 0.88rem; }
-        .search-container input::placeholder { color: var(--text-secondary); }
-        .search-clear-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; display: none; padding: 2px; border-radius: 6px; }
-        .search-clear-btn.show { display: flex; }
-        .search-clear-btn:hover { color: var(--text-primary); }
-        .search-clear-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
-
-        .user-container { position: absolute; right: 0; display: flex; align-items: center; justify-content: flex-end; }
-        .user-icon-btn { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid var(--liquid-border); }
-        .user-icon-btn img { width: 100%; height: 100%; object-fit: cover; }
-
-        .user-dropdown {
-            position: absolute; top: -4px; right: 0; width: 260px; padding: 10px;
-            display: none; flex-direction: column; gap: 4px; z-index: 99999; border-radius: 18px;
-            background: var(--dropdown-bg);
-            backdrop-filter: blur(24px) saturate(180%);
-            border: 1px solid var(--liquid-border);
-            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
-            max-height: calc(100vh - 100px);
-            overflow-y: auto;
-        }
-        .user-dropdown.show { display: flex; }
-
-        .avatar-wrapper { position: relative; width: 50px; height: 50px; margin: 4px auto 8px auto; }
-        .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
-
-        .dropdown-item {
-            background: transparent; border: none; color: var(--text-primary); text-align: left;
-            padding: 8px 12px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 0.84rem; font-weight: 500;
-            text-decoration: none; transition: background 0.15s;
-        }
-        .dropdown-item:hover { background: var(--liquid-bg); }
-        .dropdown-item .item-left { display: flex; align-items: center; gap: 10px; }
-        .dropdown-item svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
-
-        .view-container { flex: 1; overflow-y: auto; padding-right: 4px; }
-        .view { display: none; animation: fadeIn 0.25s ease; }
-        .view.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-        h1 { margin-bottom: 14px; font-weight: 600; font-size: 1.45rem; color: var(--text-primary); letter-spacing: -0.3px; }
-
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .card { padding: 16px; border-radius: 16px; display: flex; flex-direction: column; gap: 4px; }
-        .card h3 { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; }
-        .card p { font-size: 1.15rem; font-weight: 600; color: var(--text-primary); }
-
-        .track-list { display: flex; flex-direction: column; gap: 6px; list-style: none; padding-bottom: 10px; }
-        .track-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 8px 12px; border-radius: 12px; background: var(--liquid-bg);
-            cursor: pointer; transition: background 0.15s; border: 1px solid transparent;
-        }
-        .track-item:hover { border-color: var(--liquid-border); background: rgba(255, 255, 255, 0.06); }
-        .track-item.playing { border-color: var(--accent); }
-        .track-item.cached { cursor: default; opacity: 0.72; }
-        .track-item.hidden-by-search { display: none; }
-        .track-info-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-        .track-thumb { width: 36px; height: 36px; background: var(--liquid-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); border: 1px solid var(--liquid-border); flex-shrink: 0; }
-        .track-thumb svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 2; }
-        .track-titles { display: flex; flex-direction: column; min-width: 0; }
-        .track-title { font-weight: 600; font-size: 0.86rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-artist-name { font-size: 0.75rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .track-play-count { font-size: 0.72rem; color: var(--text-secondary); flex-shrink: 0; padding-left: 8px; }
-        .track-note { font-size: 0.68rem; color: var(--text-secondary); font-style: italic; flex-shrink: 0; padding-left: 8px; }
-        .empty-state-text { color: var(--text-secondary); font-size: 0.85rem; }
-
-        .blend-box { display: flex; flex-direction: column; gap: 12px; max-width: 380px; margin-top: 8px; }
-        .glass-input { background: var(--liquid-bg); border: 1px solid var(--liquid-border); color: var(--text-primary); padding: 9px 12px; border-radius: 12px; outline: none; font-size: 0.86rem; width: 100%; }
-        .glass-btn { background: var(--accent); color: white; border: none; padding: 9px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.86rem; box-shadow: 0 4px 12px var(--accent-glow); }
-        .glass-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .blend-room-list { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; max-width: 380px; }
-        .blend-room-item { padding: 10px 14px; border-radius: 12px; background: var(--liquid-bg); border: 1px solid var(--liquid-border); font-size: 0.82rem; display: flex; justify-content: space-between; align-items: center; }
-        .blend-room-code { font-weight: 700; color: var(--accent); letter-spacing: 1px; }
-
-        .settings-container { display: flex; flex-direction: column; gap: 16px; max-width: 800px; padding-bottom: 24px; }
-        .settings-section-card { padding: 18px; border-radius: 16px; display: flex; flex-direction: column; gap: 14px; }
-        .settings-section-title { font-size: 1.02rem; font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--liquid-border); padding-bottom: 10px; }
-        .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 15px; }
-        .settings-row-info { display: flex; flex-direction: column; gap: 2px; }
-        .settings-label { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
-        .settings-desc { font-size: 0.76rem; color: var(--text-secondary); }
-
-        .danger-btn { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.25); color: #f87171; padding: 7px 14px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.82rem; }
-
-        .bottom-player {
-            height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; z-index: 100;
-            border-radius: 18px; width: 100%; position: relative; overflow: hidden;
-        }
-
-        .player-compact-view { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 100%; }
-        .player-left { display: flex; align-items: center; gap: 10px; width: 26%; min-width: 0; }
-        .player-art { width: 40px; height: 40px; background: var(--liquid-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); border: 1px solid var(--liquid-border); flex-shrink: 0; }
-        .player-meta { display: flex; flex-direction: column; overflow: hidden; }
-        .player-song { font-size: 0.84rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); }
-        .player-art-name { font-size: 0.7rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        .player-center { width: 44%; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-        .player-controls { display: flex; align-items: center; gap: 16px; }
-        .control-action-btn { background: none; border: none; color: var(--text-secondary); font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .control-action-btn:hover { color: var(--text-primary); }
-        .control-action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .control-action-btn:disabled:hover { color: var(--text-secondary); }
-        .play-main-btn { font-size: 1.25rem; color: var(--text-primary) !important; }
-
-        .progress-bar-wrapper { width: 100%; display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text-secondary); }
-        .progress-range, .volume-range { -webkit-appearance: none; width: 100%; height: 4px; background: var(--liquid-border); border-radius: 2px; cursor: pointer; }
-        .progress-range::-webkit-slider-thumb, .volume-range::-webkit-slider-thumb { -webkit-appearance: none; width: 9px; height: 9px; background: var(--accent); border-radius: 50%; }
-
-        .player-right { width: 26%; display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
-        .volume-range { width: 76px; }
-
-        .theme-selector-panel { display: none; flex-direction: column; gap: 4px; margin-top: 4px; padding-left: 6px; }
-        .theme-selector-panel.show { display: flex; }
-        .theme-option-btn { background: var(--liquid-bg); border: 1px solid var(--liquid-border); color: var(--text-primary); padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; text-align: left; display: flex; align-items: center; gap: 8px; font-weight: 500; }
-        .theme-option-btn:hover { background: var(--accent); color: white; }
-        .theme-option-btn.active-theme { border-color: var(--accent); }
-
-        .toast-container { position: fixed; bottom: 92px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 8px; align-items: center; }
-        .toast { padding: 10px 18px; border-radius: 12px; font-size: 0.82rem; font-weight: 500; background: var(--dropdown-bg); border: 1px solid var(--liquid-border); color: var(--text-primary); box-shadow: 0 12px 30px rgba(0,0,0,0.4); animation: toastIn 0.2s ease; }
-        @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harmony - Audio Engine</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-main: #121212;
+      --bg-surface: #1e1e1e;
+      --bg-hover: #282828;
+      --primary: #1db954;
+      --text-main: #ffffff;
+      --text-sub: #b3b3b3;
+      --danger: #e74c3c;
+      --border: #282828;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background: var(--bg-main); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    
+    .app-container { display: flex; flex: 1; overflow: hidden; }
+    .sidebar { width: 240px; background: #000; padding: 20px; display: flex; flex-direction: column; gap: 20px; border-right: 1px solid var(--border); }
+    .brand { font-size: 20px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+    .nav-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .nav-icon { color: var(--text-sub); cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 6px; font-weight: 600; transition: all 0.2s; }
+    .nav-icon.active, .nav-icon:hover { color: var(--text-main); background: var(--bg-surface); }
+    
+    .main-content { flex: 1; padding: 24px; overflow-y: auto; background: linear-gradient(to bottom, #222222, var(--bg-main)); }
+    .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+    .auth-actions { display: flex; align-items: center; gap: 12px; }
+    .user-badge { font-weight: 600; color: var(--text-main); display: none; }
+    .btn { padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; transition: transform 0.1s; }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-outline { background: transparent; color: var(--text-main); border: 1px solid var(--text-sub); }
+    
+    .view-panel { display: none; }
+    .view-panel.active { display: block; }
+    .file-import-area { margin-bottom: 20px; }
+    .upload-label { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: var(--primary); color: #000; font-weight: bold; border-radius: 24px; cursor: pointer; }
+    .hidden-input { display: none; }
+    
+    .playlist { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .playlist-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-surface); padding: 10px 16px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
+    .playlist-item:hover { background: var(--bg-hover); }
+    .track-meta { display: flex; align-items: center; gap: 12px; flex: 1; }
+    .track-thumb { width: 48px; height: 48px; border-radius: 4px; object-fit: cover; background: #333; }
+    .playlist-item-info { display: flex; flex-direction: column; }
+    .playlist-item-title { font-weight: 600; font-size: 15px; color: var(--text-main); }
+    .playlist-item-artist { font-size: 13px; color: var(--text-sub); }
+    
+    .delete-track-btn { background: transparent; border: none; color: var(--text-sub); cursor: pointer; padding: 8px 12px; font-size: 14px; border-radius: 4px; transition: all 0.2s; }
+    .delete-track-btn:hover { color: var(--danger); background: rgba(231, 76, 60, 0.1); }
+    
+    .player-bar { height: 90px; background: #181818; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; }
+    .player-left { display: flex; align-items: center; gap: 12px; width: 25%; }
+    .player-center { display: flex; flex-direction: column; align-items: center; width: 50%; gap: 8px; }
+    .player-controls { display: flex; align-items: center; gap: 20px; }
+    .ctrl-btn { background: transparent; border: none; color: var(--text-sub); cursor: pointer; font-size: 16px; }
+    .ctrl-btn:hover { color: var(--text-main); }
+    .play-btn-main { background: var(--text-main); color: #000; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+    .progress-container { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 500px; font-size: 12px; color: var(--text-sub); }
+    .seek-bar { flex: 1; accent-color: var(--primary); cursor: pointer; height: 4px; }
+    
+    .auth-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 100; }
+    .modal-content { background: var(--bg-surface); padding: 32px; border-radius: 12px; width: 340px; display: flex; flex-direction: column; gap: 14px; position: relative; }
+    .close-btn { position: absolute; top: 12px; right: 16px; background: transparent; border: none; color: var(--text-sub); font-size: 20px; cursor: pointer; }
+    .modal-content input { padding: 12px; border-radius: 6px; border: 1px solid var(--border); background: #121212; color: #fff; }
+  </style>
 </head>
 <body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="brand"><i class="fas fa-wave-square"></i> Harmony</div>
+      <ul class="nav-list">
+        <li class="nav-icon active" data-target="library-view"><i class="fas fa-music"></i> Library</li>
+        <li class="nav-icon" data-target="discover-view"><i class="fas fa-compass"></i> Discover</li>
+      </ul>
+    </aside>
 
-    <!-- Firebase Authentication Overlay / Gate -->
-    <div class="auth-overlay-container" id="auth-overlay">
-        <div class="auth-card liquid-glass-effect">
-            <div class="auth-header">
-                <h2 class="auth-title" id="auth-form-title">Welcome to Harmony</h2>
-                <span class="auth-subtitle" id="auth-form-subtitle">Sign in or register to sync your library with Firebase</span>
-            </div>
-
-            <!-- Login / Signup Form -->
-            <form class="auth-form" id="firebase-auth-form">
-                <div class="auth-input-group" id="name-group" style="display: none;">
-                    <label class="auth-label">Display Name</label>
-                    <input type="text" class="auth-input" id="auth-name-input" placeholder="Your Name">
-                </div>
-                <div class="auth-input-group">
-                    <label class="auth-label">Email Address</label>
-                    <input type="email" class="auth-input" id="auth-email-input" placeholder="user@example.com" required>
-                </div>
-                <div class="auth-input-group" id="password-group">
-                    <label class="auth-label">Password</label>
-                    <input type="password" class="auth-input" id="auth-password-input" placeholder="••••••••" required>
-                </div>
-
-                <div class="auth-error-banner" id="auth-error-banner"></div>
-                <div class="guest-banner" id="guest-notice-banner" style="display: none;">
-                    ⚠️ <strong>Guest Mode Active:</strong> Your songs and preferences will remain local to this session and <em>won't be saved</em> to Firebase until you sign up or log in.
-                </div>
-
-                <button type="submit" class="auth-btn" id="auth-submit-btn">Sign In</button>
-            </form>
-
-            <div class="auth-footer-links">
-                <span class="auth-link" id="auth-switch-mode-btn">Create an account</span>
-                <span class="auth-link" id="auth-forgot-password-btn">Forgot password?</span>
-            </div>
-
-            <hr style="border: none; border-top: 1px solid var(--liquid-border); margin: 2px 0;">
-            <button type="button" class="auth-btn" id="guest-mode-btn" style="background: var(--liquid-bg); color: var(--text-primary); border: 1px solid var(--liquid-border);">Continue as Guest</button>
+    <main class="main-content">
+      <header class="top-header">
+        <div class="file-import-area">
+          <label for="audio-file-input" class="upload-label">
+            <i class="fas fa-cloud-upload-alt"></i> Import Audio Tracks
+          </label>
+          <input type="file" id="audio-file-input" class="hidden-input" multiple accept="audio/*">
         </div>
-    </div>
-
-    <div class="app-layout">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <button id="sidebar-toggle" class="icon-btn" title="Toggle Navigation" type="button">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-                </button>
-                <div class="brand-info">
-                    <h2 class="brand-name">Harmony</h2>
-                    <span class="brand-tier" id="user-tier-badge">Workspace</span>
-                </div>
-            </div>
-            <nav class="sidebar-nav">
-                <button class="nav-item active" data-target="discover-view" type="button">
-                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-                    <span>Discover</span>
-                </button>
-                <button class="nav-item" data-target="albums-view" type="button">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
-                    <span>Albums</span>
-                </button>
-                <button class="nav-item" data-target="playlist-view" type="button">
-                    <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                    <span>Playlist</span>
-                </button>
-                <button class="nav-item" data-target="artists-view" type="button">
-                    <svg viewBox="0 0 24 20"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                    <span>Artists</span>
-                </button>
-                <button class="nav-item" data-target="blend-view" type="button">
-                    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                    <span>Blend</span>
-                </button>
-                <button class="nav-item" data-target="settings-view" id="nav-settings-btn" type="button">
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                    <span>Settings & Privacy</span>
-                </button>
-            </nav>
-        </aside>
-
-        <main class="main-content" id="main-content-area">
-            <header class="top-nav">
-                <div class="search-container liquid-glass-effect">
-                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    <input type="text" id="search-input" placeholder="Search catalog, tracks, or artists...">
-                    <button class="search-clear-btn" id="search-clear-btn" type="button" title="Clear search">
-                        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    </button>
-                </div>
-
-                <div class="user-container">
-                    <button class="user-icon-btn liquid-glass-effect" id="user-menu-toggle" type="button" title="User Account Profile">
-                        <img src="" alt="User Avatar" id="main-avatar">
-                    </button>
-
-                    <div class="user-dropdown" id="user-dropdown">
-                        <div class="avatar-wrapper">
-                            <img src="" alt="User Avatar" id="dropdown-avatar">
-                        </div>
-                        <input type="text" id="username-display-input" class="glass-input" readonly style="text-align: center; padding: 5px; font-size: 0.82rem; margin-top: 2px; border: none; background: transparent; pointer-events: none;">
-                        <hr style="border: none; border-top: 1px solid var(--liquid-border); margin: 3px 0;">
-
-                        <label for="audio-file-importer" class="dropdown-item" style="cursor: pointer;">
-                            <div class="item-left">
-                                <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                                <span>Import local tracks</span>
-                            </div>
-                        </label>
-                        <input type="file" id="audio-file-importer" accept="audio/*" multiple hidden>
-
-                        <button class="dropdown-item" id="themes-menu-btn" style="width: 100%;" type="button">
-                            <div class="item-left">
-                                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle></svg>
-                                <span>Workspace Theme</span>
-                            </div>
-                            <svg viewBox="0 0 24 24" style="width: 12px; height: 12px;" id="themes-chevron"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </button>
-
-                        <div class="theme-selector-panel" id="theme-selector-panel">
-                            <button class="theme-option-btn" data-theme="dark" type="button">Dark Workspace</button>
-                            <button class="theme-option-btn" data-theme="light" type="button">Light Workspace</button>
-                            <button class="theme-option-btn" data-theme="cyberpunk" type="button">Cyberpunk Node</button>
-                            <button class="theme-option-btn" data-theme="sunset" type="button">Sunset Glow</button>
-                        </div>
-
-                        <hr style="border: none; border-top: 1px solid var(--liquid-border); margin: 2px 0;">
-                        <button class="dropdown-item" id="sign-out-btn" style="color: #f87171; width: 100%;" type="button">
-                            <div class="item-left" style="color: #f87171;">
-                                <svg viewBox="0 0 24 24" style="stroke: #f87171;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline></svg>
-                                <span id="sign-out-text">Sign Out</span>
-                            </div>
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <div class="view-container">
-                <section id="discover-view" class="view active">
-                    <h1>Discover Workspace</h1>
-                    <div class="grid-cards">
-                        <div class="card liquid-glass-effect">
-                            <h3>Most Played Track</h3>
-                            <p id="stat-most-song">None loaded</p>
-                        </div>
-                        <div class="card liquid-glass-effect">
-                            <h3>Active Audio Source</h3>
-                            <p>Local Engine</p>
-                        </div>
-                        <div class="card liquid-glass-effect">
-                            <h3>Primary Artist</h3>
-                            <p id="stat-most-artist">Unknown</p>
-                        </div>
-                        <div class="card liquid-glass-effect">
-                            <h3>Session Duration</h3>
-                            <p id="stat-listening-time">0 mins</p>
-                        </div>
-                    </div>
-                    <h2 style="font-size: 1.02rem; margin-bottom: 10px; font-weight: 600;">Recent Library Highlights</h2>
-                    <ul class="track-list" id="discover-track-list">
-                        <p class="empty-state-text" id="discover-empty-text">Import local audio files via the account menu to populate your library index.</p>
-                        <p class="empty-state-text" id="discover-no-match-text" style="display: none;">No tracks match your search.</p>
-                    </ul>
-                </section>
-
-                <section id="albums-view" class="view">
-                    <h1>Albums</h1>
-                    <p class="empty-state-text">Your imported collection grouped by studio release albums.</p>
-                </section>
-
-                <section id="playlist-view" class="view">
-                    <h1>Playlists</h1>
-                    <ul class="track-list" id="main-playlist-list">
-                        <p class="empty-state-text" id="playlist-empty-text">No tracks added yet. Use "Import Local Tracks" from your user menu.</p>
-                        <p class="empty-state-text" id="playlist-no-match-text" style="display: none;">No tracks match your search.</p>
-                    </ul>
-                </section>
-
-                <section id="artists-view" class="view">
-                    <h1>Artists</h1>
-                    <div class="track-list" id="artists-list-container">
-                        <p class="empty-state-text" id="artists-empty-text">Tracks will be systematically grouped by artist metadata automatically.</p>
-                    </div>
-                </section>
-
-                <section id="blend-view" class="view">
-                    <h1>Blend Rooms</h1>
-                    <p class="empty-state-text" style="margin-bottom: 14px;">Secure collaborative listening room synced with Firebase.</p>
-                    <div class="blend-box">
-                        <input type="text" id="blend-room-name-input" class="glass-input" placeholder="Custom Blend Room Name">
-                        <button class="glass-btn" id="create-blend-btn" type="button">Create Secure Room</button>
-                    </div>
-                    <div class="blend-room-list" id="blend-room-list"></div>
-                </section>
-
-                <section id="settings-view" class="view">
-                    <h1>Settings & Privacy</h1>
-                    <div class="settings-container">
-                        <div class="settings-section-card liquid-glass-effect">
-                            <div class="settings-section-title">Account & Profile</div>
-                            <div class="settings-row">
-                                <div class="settings-row-info">
-                                    <span class="settings-label">Display Name</span>
-                                    <span class="settings-desc">Your active authenticated profile handle.</span>
-                                </div>
-                                <div style="width: 190px;">
-                                    <input type="text" id="settings-display-name" class="glass-input" readonly style="padding: 6px 10px; font-size: 0.82rem; border: none; background: transparent; pointer-events: none;">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="settings-section-card liquid-glass-effect" style="border-color: rgba(239, 68, 68, 0.2);">
-                            <div class="settings-section-title" style="color: #f87171;">Data Management</div>
-                            <div class="settings-row">
-                                <div class="settings-row-info">
-                                    <span class="settings-label">Clear Local Cache</span>
-                                    <span class="settings-desc">Delete cached metadata and artwork buffers.</span>
-                                </div>
-                                <button class="danger-btn" id="clear-cache-btn" type="button">Clear Cache</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-        </main>
-    </div>
-
-    <footer class="bottom-player liquid-glass-effect" id="bottom-player">
-        <div class="player-compact-view" id="compact-info-trigger">
-            <div class="player-left">
-                <div class="player-art">
-                    <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                </div>
-                <div class="player-meta">
-                    <span class="player-song" id="player-current-title">No Track Playing</span>
-                    <span class="player-art-name" id="player-current-artist">Harmony Audio</span>
-                </div>
-            </div>
-
-            <div class="player-center">
-                <div class="player-controls">
-                    <button class="control-action-btn" id="player-prev-btn" title="Previous Track" type="button" disabled>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="4" x2="5" y2="20"></line></svg>
-                    </button>
-                    <button class="control-action-btn play-main-btn" id="player-play-pause-btn" title="Play / Pause" type="button">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon></svg>
-                    </button><button class="control-action-btn" id="player-next-btn" title="Next Track" type="button" disabled>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="4" x2="19" y2="20"></line></svg>
-                    </button>
-                </div>
-                <div class="progress-bar-wrapper">
-                    <span id="player-time-current">0:00</span>
-                    <input type="range" class="progress-range" id="player-progress-bar" value="0" min="0" max="100">
-                    <span id="player-time-total">0:00</span>
-                </div>
-            </div>
-
-            <div class="player-right">
-                <input type="range" class="volume-range" id="player-volume-bar" value="100" min="0" max="100">
-            </div>
+        <div class="auth-actions">
+          <span id="user-display" class="user-badge"></span>
+          <button id="login-btn" class="btn btn-outline">Sign In</button>
+          <button id="logout-btn" class="btn btn-outline" style="display:none;">Sign Out</button>
         </div>
-
-        <audio id="core-audio-element"></audio>
-    </footer>
-
-    <div class="toast-container" id="toast-container"></div>
-
-    <!-- Firebase SDK Scripts -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, arrayUnion, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyD8F8Buvjfx4XWWub0w0L5kIKjIr2h8D2I",
-            authDomain: "harmony-64d79.firebaseapp.com",
-            projectId: "harmony-64d79",
-            storageBucket: "harmony-64d79.firebasestorage.app",
-            messagingSenderId: "863416638733",
-            appId: "1:863416638733:web:526e6628f1ee4fedd8a444",
-            measurementId: "G-EKP6JXXT8J"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        /* ---------------------------------------------------------------
-           Small toast helper (replaces some noisier alert() calls)
-        --------------------------------------------------------------- */
-        const toastContainer = document.getElementById('toast-container');
-        function showToast(message, duration = 2600) {
-            const el = document.createElement('div');
-            el.className = 'toast';
-            el.textContent = message;
-            toastContainer.appendChild(el);
-            setTimeout(() => el.remove(), duration);
-        }
-
-        /* ---------------------------------------------------------------
-           Auth overlay state machine (sign-in / sign-up / reset)
-        --------------------------------------------------------------- */
-        let authMode = 'signin'; // 'signin' | 'signup' | 'reset'
-        let isGuest = false;
-        let currentUid = null;
-
-        const authOverlay = document.getElementById('auth-overlay');
-        const authForm = document.getElementById('firebase-auth-form');
-        const authFormTitle = document.getElementById('auth-form-title');
-        const authFormSubtitle = document.getElementById('auth-form-subtitle');
-        const nameGroup = document.getElementById('name-group');
-        const passwordGroup = document.getElementById('password-group');
-        const guestNoticeBanner = document.getElementById('guest-notice-banner');
-        const authErrorBanner = document.getElementById('auth-error-banner');
-        const authSubmitBtn = document.getElementById('auth-submit-btn');
-        const authSwitchModeBtn = document.getElementById('auth-switch-mode-btn');
-        const authForgotPasswordBtn = document.getElementById('auth-forgot-password-btn');
-        const guestModeBtn = document.getElementById('guest-mode-btn');
-        const userTierBadge = document.getElementById('user-tier-badge');
-        const signOutBtn = document.getElementById('sign-out-btn');
-        const signOutText = document.getElementById('sign-out-text');
-
-        const usernameDisplayInput = document.getElementById('username-display-input');
-        const settingsDisplayName = document.getElementById('settings-display-name');
-        const mainAvatar = document.getElementById('main-avatar');
-        const dropdownAvatar = document.getElementById('dropdown-avatar');
-
-        function setAuthMode(mode) {
-            authMode = mode;
-            authErrorBanner.style.display = 'none';
-            guestNoticeBanner.style.display = 'none';
-
-            if (mode === 'signup') {
-                authFormTitle.textContent = "Create Account";
-                authFormSubtitle.textContent = "Register to permanently sync your data with Firebase";
-                nameGroup.style.display = 'flex';
-                passwordGroup.style.display = 'flex';
-                authSubmitBtn.textContent = "Sign Up";
-                authSwitchModeBtn.textContent = "Already have an account? Sign In";
-                authForgotPasswordBtn.style.display = 'inline';
-            } else if (mode === 'reset') {
-                authFormTitle.textContent = "Reset Password";
-                authFormSubtitle.textContent = "Enter your email to receive verification reset instructions";
-                nameGroup.style.display = 'none';
-                passwordGroup.style.display = 'none';
-                authSubmitBtn.textContent = "Send Reset Email";
-                authSwitchModeBtn.textContent = "Back to Sign In";
-                authForgotPasswordBtn.style.display = 'none';
-            } else {
-                authFormTitle.textContent = "Welcome to Harmony";
-                authFormSubtitle.textContent = "Sign in or register to sync your library with Firebase";
-                nameGroup.style.display = 'none';
-                passwordGroup.style.display = 'flex';
-                authSubmitBtn.textContent = "Sign In";
-                authSwitchModeBtn.textContent = "Create an account";
-                authForgotPasswordBtn.style.display = 'inline';
-            }
-            // Hidden fields shouldn't block submission in browsers that still
-            // run constraint validation against display:none inputs.
-            document.getElementById('auth-password-input').required = (mode !== 'reset');
-        }
-
-        authSwitchModeBtn.addEventListener('click', () => {
-            if (authMode === 'reset') {
-                setAuthMode('signin');
-            } else if (authMode === 'signup') {
-                setAuthMode('signin');
-            } else {
-                setAuthMode('signup');
-            }
-        });
-
-        authForgotPasswordBtn.addEventListener('click', () => setAuthMode('reset'));
-
-        guestModeBtn.addEventListener('click', () => {
-            resetLocalLibraryState();
-            isGuest = true;
-            currentUid = null;
-            usernameDisplayInput.value = "Guest";
-            settingsDisplayName.value = "Guest";
-            mainAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=GuestSession";
-            dropdownAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=GuestSession";
-
-            guestNoticeBanner.style.display = 'block';
-            userTierBadge.textContent = "Guest Mode";
-            signOutText.textContent = "Exit Guest Mode / Sign In";
-            authOverlay.style.display = 'none';
-        });
-
-        function showAuthError(message) {
-            authErrorBanner.textContent = message;
-            authErrorBanner.style.display = 'block';
-        }
-
-        authForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('auth-email-input').value;
-            const password = document.getElementById('auth-password-input').value;
-            const inputName = document.getElementById('auth-name-input').value;
-            authErrorBanner.style.display = 'none';
-            authSubmitBtn.disabled = true;
-
-            try {
-                if (authMode === 'reset') {
-                    await sendPasswordResetEmail(auth, email);
-                    showToast("Password reset email sent — check your inbox.");
-                    setAuthMode('signin');
-                } else if (authMode === 'signup') {
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const displayName = inputName.trim() || email.split('@')[0];
-                    // Persist the chosen name on the Firebase user profile itself —
-                    // otherwise it's lost the moment this tab closes and future
-                    // logins fall back to the email prefix.
-                    try { await updateProfile(userCredential.user, { displayName }); }
-                    catch (profileErr) { console.error('Could not save display name', profileErr); }
-                    resetLocalLibraryState();
-                    applyProfile(displayName);
-                    isGuest = false;
-                    currentUid = userCredential.user.uid;
-                    authOverlay.style.display = 'none';
-                    // Deliberately NOT calling loadRemoteLibrary() here — onAuthStateChanged
-                    // fires right after this and owns loading the cached library, so calling
-                    // it here too would render every cached track twice.
-                } else {
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    const displayName = userCredential.user.displayName || email.split('@')[0];
-                    resetLocalLibraryState();
-                    applyProfile(displayName);
-                    isGuest = false;
-                    currentUid = userCredential.user.uid;
-                    authOverlay.style.display = 'none';
-                }
-            } catch (error) {
-                showAuthError(error.message.replace('Firebase: ', ''));
-            } finally {
-                authSubmitBtn.disabled = false;
-            }
-        });
-
-        function applyProfile(displayName) {
-            usernameDisplayInput.value = displayName;
-            settingsDisplayName.value = displayName;
-            mainAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`;
-            dropdownAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`;
-        }
-
-        signOutBtn.addEventListener('click', async () => {
-            try {
-                if (!isGuest) await signOut(auth);
-            } catch (e) { /* ignore network errors on sign-out */ }
-            resetLocalLibraryState();
-            isGuest = false;
-            currentUid = null;
-            usernameDisplayInput.value = "";
-            settingsDisplayName.value = "";
-            mainAvatar.src = "";
-            dropdownAvatar.src = "";
-            setAuthMode('signin');
-            authOverlay.style.display = 'flex';
-        });
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                userTierBadge.textContent = "Enterprise User";
-                const displayName = user.displayName || user.email.split('@')[0];
-                applyProfile(displayName);
-                isGuest = false;
-                currentUid = user.uid;
-                authOverlay.style.display = 'none';
-                // Single source of truth for loading cached metadata — the
-                // sign-in/sign-up submit handler intentionally does not call this,
-                // to avoid rendering the cached track list twice.
-                loadRemoteLibrary(user.uid);
-                loadBlendRooms(user.uid);
-            }
-        });
-
-        /* ---------------------------------------------------------------
-           Firestore-backed library metadata (title/artist only — actual
-           audio blobs live only in the browser tab and cannot be
-           persisted to Firestore, so re-imported files are needed after
-           a refresh; cached entries are shown as reference only).
-        --------------------------------------------------------------- */
-        async function saveTrackMeta(uid, track) {
-            if (!uid) return;
-            try {
-                await setDoc(doc(db, 'users', uid), {
-                    tracks: arrayUnion({ title: track.title, artist: track.artist })
-                }, { merge: true });
-            } catch (err) {
-                console.error('Could not sync track metadata to Firestore', err);
-            }
-        }
-
-        async function loadRemoteLibrary(uid) {
-            try {
-                const snap = await getDoc(doc(db, 'users', uid));
-                if (snap.exists()) {
-                    const data = snap.data();
-                    if (Array.isArray(data.tracks)) {
-                        renderCachedLibrary(data.tracks);
-                    }
-                }
-            } catch (err) {
-                console.error('Could not load cached library from Firestore', err);
-            }
-        }
-
-        function renderCachedLibrary(tracks) {
-            if (!tracks.length || playlist.length) return;
-            discoverEmptyText.style.display = 'none';
-            playlistEmptyText.style.display = 'none';
-            tracks.forEach(t => {
-                const li = buildTrackElement(t.title, t.artist, null, true);
-                mainPlaylistList.appendChild(li);
-                discoverTrackList.appendChild(li.cloneNode(true));
-            });
-        }
-
-        function renderBlendRoomItem(name, code) {
-            const roomItem = document.createElement('div');
-            roomItem.className = 'blend-room-item';
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = name;
-            const codeSpan = document.createElement('span');
-            codeSpan.className = 'blend-room-code';
-            codeSpan.textContent = code;
-            roomItem.appendChild(nameSpan);
-            roomItem.appendChild(codeSpan);
-            return roomItem;
-        }
-
-        // Loads this account's own blend rooms from Firestore so they survive
-        // a page refresh instead of only existing for the current tab. Scoped
-        // to createdBy == uid — guests never call this, so nobody sees another
-        // account's rooms.
-        async function loadBlendRooms(uid) {
-            try {
-                const q = query(collection(db, 'blendRooms'), where('createdBy', '==', uid));
-                const snap = await getDocs(q);
-                const rooms = [];
-                snap.forEach(docSnap => rooms.push({ id: docSnap.id, ...docSnap.data() }));
-                rooms.sort((a, b) => {
-                    const aTime = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
-                    const bTime = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
-                    return bTime - aTime;
-                });
-                const roomList = document.getElementById('blend-room-list');
-                rooms.forEach(r => roomList.appendChild(renderBlendRoomItem(r.name, r.id.slice(0, 6).toUpperCase())));
-            } catch (err) {
-                console.error('Could not load blend rooms from Firestore', err);
-            }
-        }
-
-        /* ---------------------------------------------------------------
-           Player / library state
-        --------------------------------------------------------------- */
-        const coreAudio = document.getElementById('core-audio-element');
-        const playPauseBtn = document.getElementById('player-play-pause-btn');
-        const prevBtn = document.getElementById('player-prev-btn');
-        const nextBtn = document.getElementById('player-next-btn');
-        const progressBar = document.getElementById('player-progress-bar');
-        const volumeBar = document.getElementById('player-volume-bar');
-        const currentTimeEl = document.getElementById('player-time-current');
-        const totalTimeEl = document.getElementById('player-time-total');
-        const currentTitleEl = document.getElementById('player-current-title');
-        const currentArtistEl = document.getElementById('player-current-artist');
-        const audioFileImporter = document.getElementById('audio-file-importer');
-        const mainPlaylistList = document.getElementById('main-playlist-list');
-        const discoverTrackList = document.getElementById('discover-track-list');
-        const discoverEmptyText = document.getElementById('discover-empty-text');
-        const playlistEmptyText = document.getElementById('playlist-empty-text');
-        const statMostSong = document.getElementById('stat-most-song');
-        const statMostArtist = document.getElementById('stat-most-artist');
-        const statListeningTime = document.getElementById('stat-listening-time');
-
-        let playlist = [];       // { title, artist, url }
-        let currentTrackIndex = -1;
-        let playCounts = {};     // index -> count
-        const sessionStart = Date.now();
-
-        // Clears everything tied to the current browser session — imported
-        // tracks, playback state, object URLs, and the on-screen lists — so
-        // switching accounts (or dropping into/out of guest mode) never shows
-        // one person's library to the next person on a shared device.
-        function resetLocalLibraryState() {
-            playlist.forEach(t => { try { URL.revokeObjectURL(t.url); } catch (e) { /* already revoked */ } });
-            playlist = [];
-            currentTrackIndex = -1;
-            playCounts = {};
-
-            coreAudio.pause();
-            coreAudio.removeAttribute('src');
-            coreAudio.load();
-            currentTitleEl.textContent = 'No Track Playing';
-            currentArtistEl.textContent = 'Harmony Audio';
-            progressBar.value = 0;
-            currentTimeEl.textContent = '0:00';
-            totalTimeEl.textContent = '0:00';
-
-            mainPlaylistList.querySelectorAll('.track-item').forEach(el => el.remove());
-            discoverTrackList.querySelectorAll('.track-item').forEach(el => el.remove());
-            discoverEmptyText.style.display = 'block';
-            playlistEmptyText.style.display = 'block';
-            const playlistNoMatch = document.getElementById('playlist-no-match-text');
-            const discoverNoMatch = document.getElementById('discover-no-match-text');
-            if (playlistNoMatch) playlistNoMatch.style.display = 'none';
-            if (discoverNoMatch) discoverNoMatch.style.display = 'none';
-
-            // Blend rooms and the current search query are per-account context
-            // too — leaving them in place after a sign-out would let the next
-            // person on this device see the previous account's room codes.
-            const roomList = document.getElementById('blend-room-list');
-            if (roomList) roomList.innerHTML = '';
-            const roomNameInput = document.getElementById('blend-room-name-input');
-            if (roomNameInput) roomNameInput.value = '';
-            const searchBox = document.getElementById('search-input');
-            if (searchBox) searchBox.value = '';
-            const clearBtn = document.getElementById('search-clear-btn');
-            if (clearBtn) clearBtn.classList.remove('show');
-
-            statMostSong.textContent = 'None loaded';
-            statMostArtist.textContent = 'Unknown';
-
-            updateTransportButtons();
-        }
-
-        function trackThumbSvg() {
-            return '<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>';
-        }
-
-        function buildTrackElement(title, artist, index, isCached) {
-            const li = document.createElement('li');
-            li.className = 'track-item' + (isCached ? ' cached' : '');
-            li.dataset.title = title.toLowerCase();
-            li.dataset.artist = artist.toLowerCase();
-            if (!isCached) li.dataset.index = index;
-
-            const left = document.createElement('div');
-            left.className = 'track-info-left';
-
-            const thumb = document.createElement('div');
-            thumb.className = 'track-thumb';
-            thumb.innerHTML = trackThumbSvg();
-
-            const titles = document.createElement('div');
-            titles.className = 'track-titles';
-            const titleSpan = document.createElement('span');
-            titleSpan.className = 'track-title';
-            titleSpan.textContent = title;
-            const artistSpan = document.createElement('span');
-            artistSpan.className = 'track-artist-name';
-            artistSpan.textContent = artist;
-            titles.appendChild(titleSpan);
-            titles.appendChild(artistSpan);
-
-            left.appendChild(thumb);
-            left.appendChild(titles);
-            li.appendChild(left);
-
-            if (isCached) {
-                const note = document.createElement('span');
-                note.className = 'track-note';
-                note.textContent = 'Saved — re-import to play';
-                li.appendChild(note);
-            } else {
-                const count = document.createElement('span');
-                count.className = 'track-play-count';
-                count.id = `play-count-${index}`;
-                count.textContent = '';
-                li.appendChild(count);
-
-                li.addEventListener('click', () => {
-                    loadTrack(index);
-                    coreAudio.play();
-                });
-            }
-
-            return li;
-        }
-
-        function renderTrackUI(track, index) {
-            discoverEmptyText.style.display = 'none';
-            playlistEmptyText.style.display = 'none';
-            const playlistEl = buildTrackElement(track.title, track.artist, index, false);
-            const discoverEl = buildTrackElement(track.title, track.artist, index, false);
-            mainPlaylistList.appendChild(playlistEl);
-            discoverTrackList.appendChild(discoverEl);
-        }
-
-        audioFileImporter.addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            if (files.length === 0) return;
-            files.forEach((file) => {
-                const trackObj = { title: file.name.replace(/\.[^/.]+$/, ""), artist: 'Local Audio', url: URL.createObjectURL(file) };
-
-                // A cached "re-import to play" placeholder for this same track
-                // becomes redundant the moment the real, playable file lands.
-                document.querySelectorAll('.track-item.cached').forEach(el => {
-                    if (el.dataset.title === trackObj.title.toLowerCase()) el.remove();
-                });
-
-                const index = playlist.length;
-                playlist.push(trackObj);
-                renderTrackUI(trackObj, index);
-                if (!isGuest && currentUid) saveTrackMeta(currentUid, trackObj);
-            });
-            if (currentTrackIndex === -1 && playlist.length > 0) loadTrack(0);
-            updateTransportButtons();
-            audioFileImporter.value = '';
-        });
-
-        function loadTrack(index) {
-            if (index < 0 || index >= playlist.length) return;
-            currentTrackIndex = index;
-            const track = playlist[index];
-            coreAudio.src = track.url;
-            currentTitleEl.textContent = track.title;
-            currentArtistEl.textContent = track.artist;
-
-            playCounts[index] = (playCounts[index] || 0) + 1;
-            const countEl = document.getElementById(`play-count-${index}`);
-            if (countEl) countEl.textContent = `${playCounts[index]} play${playCounts[index] === 1 ? '' : 's'}`;
-
-            document.querySelectorAll('.track-item').forEach(el => el.classList.remove('playing'));
-            document.querySelectorAll(`.track-item[data-index="${index}"]`).forEach(el => el.classList.add('playing'));
-
-            updateTransportButtons();
-            updateStats();
-        }
-
-        function updateTransportButtons() {
-            prevBtn.disabled = currentTrackIndex <= 0;
-            nextBtn.disabled = currentTrackIndex === -1 || currentTrackIndex >= playlist.length - 1;
-        }
-
-        function updateStats() {
-            if (!playlist.length) return;
-            let bestIndex = 0;
-            let bestCount = -1;
-            Object.keys(playCounts).forEach(i => {
-                if (playCounts[i] > bestCount) { bestCount = playCounts[i]; bestIndex = Number(i); }
-            });
-            if (bestCount > 0) {
-                statMostSong.textContent = playlist[bestIndex].title;
-                statMostArtist.textContent = playlist[bestIndex].artist;
-            }
-        }
-
-        function updateSessionDuration() {
-            const mins = Math.max(0, Math.round((Date.now() - sessionStart) / 60000));
-            statListeningTime.textContent = `${mins} min${mins === 1 ? '' : 's'}`;
-        }
-        setInterval(updateSessionDuration, 15000);
-        updateSessionDuration();
-
-        playPauseBtn.addEventListener('click', () => {
-            if (!coreAudio.src) return;
-            if (coreAudio.paused) coreAudio.play(); else coreAudio.pause();
-        });
-
-        prevBtn.addEventListener('click', () => {
-            if (currentTrackIndex > 0) { loadTrack(currentTrackIndex - 1); coreAudio.play(); }
-        });
-        nextBtn.addEventListener('click', () => {
-            if (currentTrackIndex < playlist.length - 1) { loadTrack(currentTrackIndex + 1); coreAudio.play(); }
-        });
-        coreAudio.addEventListener('ended', () => {
-            if (currentTrackIndex < playlist.length - 1) { loadTrack(currentTrackIndex + 1); coreAudio.play(); }
-        });
-
-        coreAudio.addEventListener('timeupdate', () => {
-            if (coreAudio.duration) {
-                progressBar.value = (coreAudio.currentTime / coreAudio.duration) * 100;
-                let curMins = Math.floor(coreAudio.currentTime / 60);
-                let curSecs = Math.floor(coreAudio.currentTime % 60);
-                currentTimeEl.textContent = `${curMins}:${curSecs < 10 ? '0' : ''}${curSecs}`;
-                let totMins = Math.floor(coreAudio.duration / 60);
-                let totSecs = Math.floor(coreAudio.duration % 60);
-                totalTimeEl.textContent = `${totMins}:${totSecs < 10 ? '0' : ''}${totSecs}`;
-            }
-        });
-
-        progressBar.addEventListener('input', (e) => {
-            if (coreAudio.duration) coreAudio.currentTime = (e.target.value / 100) * coreAudio.duration;
-        });
-
-        volumeBar.addEventListener('input', (e) => { coreAudio.volume = e.target.value / 100; });
-
-        /* ---------------------------------------------------------------
-           Navigation
-        --------------------------------------------------------------- */
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-                item.classList.add('active');
-                document.getElementById(item.dataset.target).classList.add('active');
-            });
-        });
-
-        document.getElementById('sidebar-toggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('collapsed');
-        });
-
-        /* ---------------------------------------------------------------
-           User dropdown + theme panel
-        --------------------------------------------------------------- */
-        const userDropdown = document.getElementById('user-dropdown');
-        const userMenuToggle = document.getElementById('user-menu-toggle');
-        const themesMenuBtn = document.getElementById('themes-menu-btn');
-        const themePanel = document.getElementById('theme-selector-panel');
-        const themesChevron = document.getElementById('themes-chevron');
-
-        userMenuToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            userDropdown.classList.toggle('show');
-        });
-
-        themesMenuBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            themePanel.classList.toggle('show');
-            themesChevron.style.transform = themePanel.classList.contains('show') ? 'rotate(90deg)' : 'rotate(0deg)';
-        });
-
-        document.addEventListener('click', (e) => {
-            if (!userDropdown.contains(e.target) && !userMenuToggle.contains(e.target)) {
-                userDropdown.classList.remove('show');
-                themePanel.classList.remove('show');
-                themesChevron.style.transform = 'rotate(0deg)';
-            }
-        });
-
-        function applyTheme(themeName) {
-            document.body.className = '';
-            if (themeName !== 'dark') document.body.classList.add('theme-' + themeName);
-            document.querySelectorAll('.theme-option-btn').forEach(b => {
-                b.classList.toggle('active-theme', b.dataset.theme === themeName);
-            });
-            try { localStorage.setItem('harmony_theme', themeName); } catch (e) { /* storage unavailable */ }
-        }
-
-        document.querySelectorAll('.theme-option-btn').forEach(btn => {
-            btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
-        });
-
-        try {
-            const savedTheme = localStorage.getItem('harmony_theme');
-            if (savedTheme) applyTheme(savedTheme);
-        } catch (e) { /* storage unavailable */ }
-
-        /* ---------------------------------------------------------------
-           Search — filters whichever list is currently in view
-        --------------------------------------------------------------- */
-        const searchInput = document.getElementById('search-input');
-        const searchClearBtn = document.getElementById('search-clear-btn');
-
-        const playlistNoMatchText = document.getElementById('playlist-no-match-text');
-        const discoverNoMatchText = document.getElementById('discover-no-match-text');
-
-        function applySearchFilter() {
-            const query = searchInput.value.trim().toLowerCase();
-            searchClearBtn.classList.toggle('show', query.length > 0);
-            document.querySelectorAll('#main-playlist-list .track-item, #discover-track-list .track-item').forEach(li => {
-                const match = !query || li.dataset.title.includes(query) || li.dataset.artist.includes(query);
-                li.classList.toggle('hidden-by-search', !match);
-            });
-
-            const playlistHasTracks = !!mainPlaylistList.querySelector('.track-item');
-            const playlistHasVisible = !!mainPlaylistList.querySelector('.track-item:not(.hidden-by-search)');
-            playlistNoMatchText.style.display = (query && playlistHasTracks && !playlistHasVisible) ? 'block' : 'none';
-
-            const discoverHasTracks = !!discoverTrackList.querySelector('.track-item');
-            const discoverHasVisible = !!discoverTrackList.querySelector('.track-item:not(.hidden-by-search)');
-            discoverNoMatchText.style.display = (query && discoverHasTracks && !discoverHasVisible) ? 'block' : 'none';
-        }
-        searchInput.addEventListener('input', applySearchFilter);
-        searchClearBtn.addEventListener('click', () => {
-            searchInput.value = '';
-            applySearchFilter();
-            searchInput.focus();
-        });
-
-        /* ---------------------------------------------------------------
-           Settings — clear cache
-        --------------------------------------------------------------- */
-        document.getElementById('clear-cache-btn').addEventListener('click', async () => {
-            try {
-                Object.keys(localStorage)
-                    .filter(k => k.startsWith('harmony_') && k !== 'harmony_theme')
-                    .forEach(k => localStorage.removeItem(k));
-            } catch (e) { /* storage unavailable */ }
-
-            document.querySelectorAll('.track-item.cached').forEach(el => el.remove());
-            if (!mainPlaylistList.querySelector('.track-item')) playlistEmptyText.style.display = 'block';
-            if (!discoverTrackList.querySelector('.track-item')) discoverEmptyText.style.display = 'block';
-
-            // Clear it at the source too — otherwise the same cached entries
-            // just come back on the next sign-in.
-            if (!isGuest && currentUid) {
-                try {
-                    await setDoc(doc(db, 'users', currentUid), { tracks: [] }, { merge: true });
-                } catch (err) {
-                    console.error('Could not clear remote metadata', err);
-                }
-            }
-            showToast('Cached metadata and artwork buffers cleared.');
-        });
-
-        /* ---------------------------------------------------------------
-           Blend rooms
-        --------------------------------------------------------------- */
-        const blendRoomNameInput = document.getElementById('blend-room-name-input');
-        const createBlendBtn = document.getElementById('create-blend-btn');
-        const blendRoomList = document.getElementById('blend-room-list');
-
-        createBlendBtn.addEventListener('click', async () => {
-            const name = blendRoomNameInput.value.trim();
-            if (!name) { showToast('Give the room a name first.'); return; }
-            createBlendBtn.disabled = true;
-            try {
-                const roomRef = await addDoc(collection(db, 'blendRooms'), {
-                    name,
-                    createdBy: currentUid || 'guest',
-                    createdAt: serverTimestamp()
-                });
-                const code = roomRef.id.slice(0, 6).toUpperCase();
-                const roomItem = renderBlendRoomItem(name, code);
-                blendRoomList.prepend(roomItem);
-                blendRoomNameInput.value = '';
-                showToast(`Room "${name}" created — share code ${code}`);
-            } catch (err) {
-                showToast('Could not create the room. Check your connection and try again.');
-                console.error(err);
-            } finally {
-                createBlendBtn.disabled = false;
-            }
-        });
-    </script>
+      </header>
+
+      <section id="library-view" class="view-panel active">
+        <ul id="playlist" class="playlist"></ul>
+      </section>
+
+      <section id="discover-view" class="view-panel">
+        <button id="featured-play-btn" class="btn btn-primary">Play Featured Track</button>
+      </section>
+    </main>
+  </div>
+
+  <footer class="player-bar">
+    <div class="player-left">
+      <div id="track-thumbnail"><div class="track-thumb"></div></div>
+      <div>
+        <div id="current-title" class="playlist-item-title">No Track Selected</div>
+        <div id="current-artist" class="playlist-item-artist">---</div>
+      </div>
+    </div>
+    <div class="player-center">
+      <div class="player-controls">
+        <button id="play-btn" class="ctrl-btn play-btn-main"><i class="fas fa-play"></i></button>
+        <button id="pause-btn" class="ctrl-btn"><i class="fas fa-pause"></i></button>
+      </div>
+      <div class="progress-container">
+        <span id="current-time">0:00</span>
+        <input type="range" id="seek-bar" class="seek-bar" value="0" min="0" max="100">
+        <span id="total-duration">0:00</span>
+      </div>
+    </div>
+    <div style="width:25%;"></div>
+    <audio id="audio-element"></audio>
+  </footer>
+
+  <div id="auth-modal" class="auth-modal">
+    <div class="modal-content">
+      <button id="close-modal" class="close-btn">&times;</button>
+      <h3>Account Access</h3>
+      <input type="text" id="profile-name" placeholder="Display Name (Sign Up)">
+      <input type="email" id="auth-email" placeholder="Email Address">
+      <input type="password" id="auth-password" placeholder="Password">
+      <button id="submit-login" class="btn btn-primary">Log In</button>
+      <button id="submit-signup" class="btn btn-outline">Sign Up</button>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
 </body>
 </html>
