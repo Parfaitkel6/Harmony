@@ -497,6 +497,7 @@
                     <h2 style="font-size: 1.02rem; margin-bottom: 10px; font-weight: 600;">Recent Library Highlights</h2>
                     <ul class="track-list" id="discover-track-list">
                         <p class="empty-state-text" id="discover-empty-text">Import local audio files via the account menu to populate your library index.</p>
+                        <p class="empty-state-text" id="discover-no-match-text" style="display: none;">No tracks match your search.</p>
                     </ul>
                 </section>
 
@@ -509,6 +510,7 @@
                     <h1>Playlists</h1>
                     <ul class="track-list" id="main-playlist-list">
                         <p class="empty-state-text" id="playlist-empty-text">No tracks added yet. Use "Import Local Tracks" from your user menu.</p>
+                        <p class="empty-state-text" id="playlist-no-match-text" style="display: none;">No tracks match your search.</p>
                     </ul>
                 </section>
 
@@ -603,8 +605,8 @@
     <!-- Firebase SDK Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, arrayUnion, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD8F8Buvjfx4XWWub0w0L5kIKjIr2h8D2I",
@@ -690,6 +692,9 @@
                 authSwitchModeBtn.textContent = "Create an account";
                 authForgotPasswordBtn.style.display = 'inline';
             }
+            // Hidden fields shouldn't block submission in browsers that still
+            // run constraint validation against display:none inputs.
+            document.getElementById('auth-password-input').required = (mode !== 'reset');
         }
 
         authSwitchModeBtn.addEventListener('click', () => {
@@ -705,6 +710,7 @@
         authForgotPasswordBtn.addEventListener('click', () => setAuthMode('reset'));
 
         guestModeBtn.addEventListener('click', () => {
+            resetLocalLibraryState();
             isGuest = true;
             currentUid = null;
             usernameDisplayInput.value = "Guest";
@@ -739,18 +745,26 @@
                 } else if (authMode === 'signup') {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const displayName = inputName.trim() || email.split('@')[0];
+                    // Persist the chosen name on the Firebase user profile itself —
+                    // otherwise it's lost the moment this tab closes and future
+                    // logins fall back to the email prefix.
+                    try { await updateProfile(userCredential.user, { displayName }); }
+                    catch (profileErr) { console.error('Could not save display name', profileErr); }
+                    resetLocalLibraryState();
                     applyProfile(displayName);
                     isGuest = false;
                     currentUid = userCredential.user.uid;
-                    await loadRemoteLibrary(currentUid);
                     authOverlay.style.display = 'none';
+                    // Deliberately NOT calling loadRemoteLibrary() here — onAuthStateChanged
+                    // fires right after this and owns loading the cached library, so calling
+                    // it here too would render every cached track twice.
                 } else {
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     const displayName = userCredential.user.displayName || email.split('@')[0];
+                    resetLocalLibraryState();
                     applyProfile(displayName);
                     isGuest = false;
                     currentUid = userCredential.user.uid;
-                    await loadRemoteLibrary(currentUid);
                     authOverlay.style.display = 'none';
                 }
             } catch (error) {
@@ -771,6 +785,7 @@
             try {
                 if (!isGuest) await signOut(auth);
             } catch (e) { /* ignore network errors on sign-out */ }
+            resetLocalLibraryState();
             isGuest = false;
             currentUid = null;
             usernameDisplayInput.value = "";
@@ -789,7 +804,11 @@
                 isGuest = false;
                 currentUid = user.uid;
                 authOverlay.style.display = 'none';
+                // Single source of truth for loading cached metadata — the
+                // sign-in/sign-up submit handler intentionally does not call this,
+                // to avoid rendering the cached track list twice.
                 loadRemoteLibrary(user.uid);
+                loadBlendRooms(user.uid);
             }
         });
 
@@ -835,6 +854,41 @@
             });
         }
 
+        function renderBlendRoomItem(name, code) {
+            const roomItem = document.createElement('div');
+            roomItem.className = 'blend-room-item';
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = name;
+            const codeSpan = document.createElement('span');
+            codeSpan.className = 'blend-room-code';
+            codeSpan.textContent = code;
+            roomItem.appendChild(nameSpan);
+            roomItem.appendChild(codeSpan);
+            return roomItem;
+        }
+
+        // Loads this account's own blend rooms from Firestore so they survive
+        // a page refresh instead of only existing for the current tab. Scoped
+        // to createdBy == uid — guests never call this, so nobody sees another
+        // account's rooms.
+        async function loadBlendRooms(uid) {
+            try {
+                const q = query(collection(db, 'blendRooms'), where('createdBy', '==', uid));
+                const snap = await getDocs(q);
+                const rooms = [];
+                snap.forEach(docSnap => rooms.push({ id: docSnap.id, ...docSnap.data() }));
+                rooms.sort((a, b) => {
+                    const aTime = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+                    const bTime = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+                    return bTime - aTime;
+                });
+                const roomList = document.getElementById('blend-room-list');
+                rooms.forEach(r => roomList.appendChild(renderBlendRoomItem(r.name, r.id.slice(0, 6).toUpperCase())));
+            } catch (err) {
+                console.error('Could not load blend rooms from Firestore', err);
+            }
+        }
+
         /* ---------------------------------------------------------------
            Player / library state
         --------------------------------------------------------------- */
@@ -862,6 +916,52 @@
         let playCounts = {};     // index -> count
         const sessionStart = Date.now();
 
+        // Clears everything tied to the current browser session — imported
+        // tracks, playback state, object URLs, and the on-screen lists — so
+        // switching accounts (or dropping into/out of guest mode) never shows
+        // one person's library to the next person on a shared device.
+        function resetLocalLibraryState() {
+            playlist.forEach(t => { try { URL.revokeObjectURL(t.url); } catch (e) { /* already revoked */ } });
+            playlist = [];
+            currentTrackIndex = -1;
+            playCounts = {};
+
+            coreAudio.pause();
+            coreAudio.removeAttribute('src');
+            coreAudio.load();
+            currentTitleEl.textContent = 'No Track Playing';
+            currentArtistEl.textContent = 'Harmony Audio';
+            progressBar.value = 0;
+            currentTimeEl.textContent = '0:00';
+            totalTimeEl.textContent = '0:00';
+
+            mainPlaylistList.querySelectorAll('.track-item').forEach(el => el.remove());
+            discoverTrackList.querySelectorAll('.track-item').forEach(el => el.remove());
+            discoverEmptyText.style.display = 'block';
+            playlistEmptyText.style.display = 'block';
+            const playlistNoMatch = document.getElementById('playlist-no-match-text');
+            const discoverNoMatch = document.getElementById('discover-no-match-text');
+            if (playlistNoMatch) playlistNoMatch.style.display = 'none';
+            if (discoverNoMatch) discoverNoMatch.style.display = 'none';
+
+            // Blend rooms and the current search query are per-account context
+            // too — leaving them in place after a sign-out would let the next
+            // person on this device see the previous account's room codes.
+            const roomList = document.getElementById('blend-room-list');
+            if (roomList) roomList.innerHTML = '';
+            const roomNameInput = document.getElementById('blend-room-name-input');
+            if (roomNameInput) roomNameInput.value = '';
+            const searchBox = document.getElementById('search-input');
+            if (searchBox) searchBox.value = '';
+            const clearBtn = document.getElementById('search-clear-btn');
+            if (clearBtn) clearBtn.classList.remove('show');
+
+            statMostSong.textContent = 'None loaded';
+            statMostArtist.textContent = 'Unknown';
+
+            updateTransportButtons();
+        }
+
         function trackThumbSvg() {
             return '<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>';
         }
@@ -871,6 +971,7 @@
             li.className = 'track-item' + (isCached ? ' cached' : '');
             li.dataset.title = title.toLowerCase();
             li.dataset.artist = artist.toLowerCase();
+            if (!isCached) li.dataset.index = index;
 
             const left = document.createElement('div');
             left.className = 'track-info-left';
@@ -929,6 +1030,13 @@
             if (files.length === 0) return;
             files.forEach((file) => {
                 const trackObj = { title: file.name.replace(/\.[^/.]+$/, ""), artist: 'Local Audio', url: URL.createObjectURL(file) };
+
+                // A cached "re-import to play" placeholder for this same track
+                // becomes redundant the moment the real, playable file lands.
+                document.querySelectorAll('.track-item.cached').forEach(el => {
+                    if (el.dataset.title === trackObj.title.toLowerCase()) el.remove();
+                });
+
                 const index = playlist.length;
                 playlist.push(trackObj);
                 renderTrackUI(trackObj, index);
@@ -952,6 +1060,7 @@
             if (countEl) countEl.textContent = `${playCounts[index]} play${playCounts[index] === 1 ? '' : 's'}`;
 
             document.querySelectorAll('.track-item').forEach(el => el.classList.remove('playing'));
+            document.querySelectorAll(`.track-item[data-index="${index}"]`).forEach(el => el.classList.add('playing'));
 
             updateTransportButtons();
             updateStats();
@@ -1083,6 +1192,9 @@
         const searchInput = document.getElementById('search-input');
         const searchClearBtn = document.getElementById('search-clear-btn');
 
+        const playlistNoMatchText = document.getElementById('playlist-no-match-text');
+        const discoverNoMatchText = document.getElementById('discover-no-match-text');
+
         function applySearchFilter() {
             const query = searchInput.value.trim().toLowerCase();
             searchClearBtn.classList.toggle('show', query.length > 0);
@@ -1090,6 +1202,14 @@
                 const match = !query || li.dataset.title.includes(query) || li.dataset.artist.includes(query);
                 li.classList.toggle('hidden-by-search', !match);
             });
+
+            const playlistHasTracks = !!mainPlaylistList.querySelector('.track-item');
+            const playlistHasVisible = !!mainPlaylistList.querySelector('.track-item:not(.hidden-by-search)');
+            playlistNoMatchText.style.display = (query && playlistHasTracks && !playlistHasVisible) ? 'block' : 'none';
+
+            const discoverHasTracks = !!discoverTrackList.querySelector('.track-item');
+            const discoverHasVisible = !!discoverTrackList.querySelector('.track-item:not(.hidden-by-search)');
+            discoverNoMatchText.style.display = (query && discoverHasTracks && !discoverHasVisible) ? 'block' : 'none';
         }
         searchInput.addEventListener('input', applySearchFilter);
         searchClearBtn.addEventListener('click', () => {
@@ -1101,13 +1221,26 @@
         /* ---------------------------------------------------------------
            Settings — clear cache
         --------------------------------------------------------------- */
-        document.getElementById('clear-cache-btn').addEventListener('click', () => {
+        document.getElementById('clear-cache-btn').addEventListener('click', async () => {
             try {
                 Object.keys(localStorage)
                     .filter(k => k.startsWith('harmony_') && k !== 'harmony_theme')
                     .forEach(k => localStorage.removeItem(k));
             } catch (e) { /* storage unavailable */ }
+
             document.querySelectorAll('.track-item.cached').forEach(el => el.remove());
+            if (!mainPlaylistList.querySelector('.track-item')) playlistEmptyText.style.display = 'block';
+            if (!discoverTrackList.querySelector('.track-item')) discoverEmptyText.style.display = 'block';
+
+            // Clear it at the source too — otherwise the same cached entries
+            // just come back on the next sign-in.
+            if (!isGuest && currentUid) {
+                try {
+                    await setDoc(doc(db, 'users', currentUid), { tracks: [] }, { merge: true });
+                } catch (err) {
+                    console.error('Could not clear remote metadata', err);
+                }
+            }
             showToast('Cached metadata and artwork buffers cleared.');
         });
 
@@ -1128,18 +1261,11 @@
                     createdBy: currentUid || 'guest',
                     createdAt: serverTimestamp()
                 });
-                const roomItem = document.createElement('div');
-                roomItem.className = 'blend-room-item';
-                const nameSpan = document.createElement('span');
-                nameSpan.textContent = name;
-                const codeSpan = document.createElement('span');
-                codeSpan.className = 'blend-room-code';
-                codeSpan.textContent = roomRef.id.slice(0, 6).toUpperCase();
-                roomItem.appendChild(nameSpan);
-                roomItem.appendChild(codeSpan);
+                const code = roomRef.id.slice(0, 6).toUpperCase();
+                const roomItem = renderBlendRoomItem(name, code);
                 blendRoomList.prepend(roomItem);
                 blendRoomNameInput.value = '';
-                showToast(`Room "${name}" created — share code ${codeSpan.textContent}`);
+                showToast(`Room "${name}" created — share code ${code}`);
             } catch (err) {
                 showToast('Could not create the room. Check your connection and try again.');
                 console.error(err);
