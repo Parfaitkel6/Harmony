@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Harmony | Enterprise Audio Workspace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             --bg-color: #0c0d12;
@@ -16,7 +16,7 @@
             --accent: #2563eb;
             --accent-glow: rgba(37, 99, 235, 0.25);
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --liquid-bg: rgba(255, 255, 255, 0.04); 
+            --liquid-bg: rgba(255, 255, 255, 0.04);
             --liquid-border: rgba(255, 255, 255, 0.08);
             --liquid-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 32px rgba(0, 0, 0, 0.4);
             --sidebar-bg: rgba(12, 13, 18, 0.8);
@@ -78,12 +78,12 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
-        body { 
-            background: var(--bg-url) no-repeat center center fixed; 
-            background-size: cover; 
-            color: var(--text-primary); 
-            height: 100vh; 
-            overflow: hidden; 
+        body {
+            background: var(--bg-url) no-repeat center center fixed;
+            background-size: cover;
+            color: var(--text-primary);
+            height: 100vh;
+            overflow: hidden;
             padding: 12px;
             transition: background 0.5s ease, color 0.3s ease;
         }
@@ -121,19 +121,21 @@
             background: var(--dropdown-bg);
             animation: dropdownSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
+        @keyframes dropdownSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .auth-header { text-align: center; display: flex; flex-direction: column; gap: 6px; }
         .auth-title { font-size: 1.5rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.4px; }
         .auth-subtitle { font-size: 0.85rem; color: var(--text-secondary); }
-        
+
         .auth-form { display: flex; flex-direction: column; gap: 14px; }
         .auth-input-group { display: flex; flex-direction: column; gap: 6px; text-align: left; }
         .auth-label { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
         .auth-input { background: var(--liquid-bg); border: 1px solid var(--liquid-border); color: var(--text-primary); padding: 11px 14px; border-radius: 12px; outline: none; font-size: 0.9rem; transition: border-color 0.2s; }
         .auth-input:focus { border-color: var(--accent); }
-        
+
         .auth-btn { background: var(--accent); color: white; border: none; padding: 12px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.95rem; box-shadow: 0 4px 16px var(--accent-glow); transition: opacity 0.2s; }
         .auth-btn:hover { opacity: 0.92; }
-        
+        .auth-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
         .auth-footer-links { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; margin-top: 4px; }
         .auth-link { color: var(--accent); cursor: pointer; text-decoration: none; font-weight: 500; }
         .auth-link:hover { text-decoration: underline; }
@@ -142,30 +144,34 @@
             background: rgba(234, 179, 8, 0.12); border: 1px solid rgba(234, 179, 8, 0.3); color: #facc15;
             padding: 10px 14px; border-radius: 10px; font-size: 0.78rem; text-align: center; line-height: 1.4;
         }
+        .auth-error-banner {
+            background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171;
+            padding: 10px 14px; border-radius: 10px; font-size: 0.78rem; text-align: center; line-height: 1.4; display: none;
+        }
 
-        .app-layout { 
-            display: flex; 
-            height: calc(100vh - 92px); 
-            gap: 12px; 
+        .app-layout {
+            display: flex;
+            height: calc(100vh - 92px);
+            gap: 12px;
             margin-bottom: 8px;
         }
 
-        .sidebar { 
-            width: 260px; 
-            background: var(--sidebar-bg); 
-            backdrop-filter: blur(20px); 
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(20px);
             border: 1px solid var(--liquid-border);
-            border-radius: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            transition: var(--transition); 
-            overflow: hidden; 
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            overflow: hidden;
             z-index: 10;
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
             height: 100%;
         }
         .sidebar.collapsed { width: 76px; }
-        .sidebar.collapsed .brand-info, 
+        .sidebar.collapsed .brand-info,
         .sidebar.collapsed .nav-item span { display: none; }
         .sidebar.collapsed .sidebar-header { justify-content: center; padding: 20px 0; }
 
@@ -173,14 +179,14 @@
         .brand-info { display: flex; flex-direction: column; }
         .brand-name { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); line-height: 1.2; }
         .brand-tier { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; color: var(--accent); letter-spacing: 0.8px; }
-        
+
         .icon-btn { background: none; border: none; color: var(--text-secondary); font-size: 1.05rem; cursor: pointer; padding: 6px; border-radius: 8px; transition: var(--transition); display: flex; align-items: center; justify-content: center; }
         .icon-btn:hover { color: var(--text-primary); background: var(--liquid-bg); }
 
         .sidebar-nav { display: flex; flex-direction: column; gap: 4px; padding: 0 12px; }
-        .nav-item { 
-            display: flex; align-items: center; gap: 14px; padding: 10px 14px; 
-            background: transparent; border: none; color: var(--text-secondary); 
+        .nav-item {
+            display: flex; align-items: center; gap: 14px; padding: 10px 14px;
+            background: transparent; border: none; color: var(--text-secondary);
             cursor: pointer; border-radius: 12px; font-size: 0.88rem; font-weight: 500;
             transition: var(--transition); white-space: nowrap; text-align: left;
         }
@@ -189,13 +195,13 @@
         .nav-item svg { width: 18px; height: 18px; flex-shrink: 0; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
         .nav-item.active svg { stroke: white; }
 
-        .main-content { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            padding: 10px 24px; 
-            overflow: hidden; 
-            position: relative; 
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 24px;
+            overflow: hidden;
+            position: relative;
             background: var(--main-bg);
             border: 1px solid var(--main-border);
             border-radius: 20px;
@@ -205,16 +211,20 @@
 
         .top-nav { display: flex; justify-content: center; align-items: center; gap: 20px; position: relative; margin-bottom: 16px; z-index: 50; flex-shrink: 0; }
         .search-container { display: flex; align-items: center; gap: 10px; padding: 8px 16px; width: 420px; border-radius: 24px; }
-        .search-container svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; }
+        .search-container svg { width: 16px; height: 16px; stroke: var(--text-secondary); stroke-width: 2.2; fill: none; flex-shrink: 0; }
         .search-container input { background: none; border: none; outline: none; color: var(--text-primary); width: 100%; font-size: 0.88rem; }
         .search-container input::placeholder { color: var(--text-secondary); }
+        .search-clear-btn { background: none; border: none; color: var(--text-secondary); cursor: pointer; display: none; padding: 2px; border-radius: 6px; }
+        .search-clear-btn.show { display: flex; }
+        .search-clear-btn:hover { color: var(--text-primary); }
+        .search-clear-btn svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
 
         .user-container { position: absolute; right: 0; display: flex; align-items: center; justify-content: flex-end; }
         .user-icon-btn { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; cursor: pointer; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid var(--liquid-border); }
         .user-icon-btn img { width: 100%; height: 100%; object-fit: cover; }
 
-        .user-dropdown { 
-            position: absolute; top: -4px; right: 0; width: 260px; padding: 10px; 
+        .user-dropdown {
+            position: absolute; top: -4px; right: 0; width: 260px; padding: 10px;
             display: none; flex-direction: column; gap: 4px; z-index: 99999; border-radius: 18px;
             background: var(--dropdown-bg);
             backdrop-filter: blur(24px) saturate(180%);
@@ -227,9 +237,9 @@
 
         .avatar-wrapper { position: relative; width: 50px; height: 50px; margin: 4px auto 8px auto; }
         .avatar-wrapper img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
-        
-        .dropdown-item { 
-            background: transparent; border: none; color: var(--text-primary); text-align: left; 
+
+        .dropdown-item {
+            background: transparent; border: none; color: var(--text-primary); text-align: left;
             padding: 8px 12px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; font-size: 0.84rem; font-weight: 500;
             text-decoration: none; transition: background 0.15s;
         }
@@ -243,29 +253,39 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
         h1 { margin-bottom: 14px; font-weight: 600; font-size: 1.45rem; color: var(--text-primary); letter-spacing: -0.3px; }
-        
+
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
         .card { padding: 16px; border-radius: 16px; display: flex; flex-direction: column; gap: 4px; }
         .card h3 { font-size: 0.8rem; color: var(--text-secondary); font-weight: 500; }
         .card p { font-size: 1.15rem; font-weight: 600; color: var(--text-primary); }
 
         .track-list { display: flex; flex-direction: column; gap: 6px; list-style: none; padding-bottom: 10px; }
-        .track-item { 
-            display: flex; align-items: center; justify-content: space-between; 
-            padding: 8px 12px; border-radius: 12px; background: var(--liquid-bg); 
+        .track-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 8px 12px; border-radius: 12px; background: var(--liquid-bg);
             cursor: pointer; transition: background 0.15s; border: 1px solid transparent;
         }
         .track-item:hover { border-color: var(--liquid-border); background: rgba(255, 255, 255, 0.06); }
-        .track-info-left { display: flex; align-items: center; gap: 12px; }
-        .track-thumb { width: 36px; height: 36px; background: var(--liquid-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); border: 1px solid var(--liquid-border); }
+        .track-item.playing { border-color: var(--accent); }
+        .track-item.cached { cursor: default; opacity: 0.72; }
+        .track-item.hidden-by-search { display: none; }
+        .track-info-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .track-thumb { width: 36px; height: 36px; background: var(--liquid-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); border: 1px solid var(--liquid-border); flex-shrink: 0; }
         .track-thumb svg { width: 16px; height: 16px; stroke: var(--text-secondary); fill: none; stroke-width: 2; }
-        .track-titles { display: flex; flex-direction: column; }
-        .track-title { font-weight: 600; font-size: 0.86rem; color: var(--text-primary); }
-        .track-artist-name { font-size: 0.75rem; color: var(--text-secondary); }
+        .track-titles { display: flex; flex-direction: column; min-width: 0; }
+        .track-title { font-weight: 600; font-size: 0.86rem; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-artist-name { font-size: 0.75rem; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-play-count { font-size: 0.72rem; color: var(--text-secondary); flex-shrink: 0; padding-left: 8px; }
+        .track-note { font-size: 0.68rem; color: var(--text-secondary); font-style: italic; flex-shrink: 0; padding-left: 8px; }
+        .empty-state-text { color: var(--text-secondary); font-size: 0.85rem; }
 
         .blend-box { display: flex; flex-direction: column; gap: 12px; max-width: 380px; margin-top: 8px; }
         .glass-input { background: var(--liquid-bg); border: 1px solid var(--liquid-border); color: var(--text-primary); padding: 9px 12px; border-radius: 12px; outline: none; font-size: 0.86rem; width: 100%; }
         .glass-btn { background: var(--accent); color: white; border: none; padding: 9px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.86rem; box-shadow: 0 4px 12px var(--accent-glow); }
+        .glass-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .blend-room-list { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; max-width: 380px; }
+        .blend-room-item { padding: 10px 14px; border-radius: 12px; background: var(--liquid-bg); border: 1px solid var(--liquid-border); font-size: 0.82rem; display: flex; justify-content: space-between; align-items: center; }
+        .blend-room-code { font-weight: 700; color: var(--accent); letter-spacing: 1px; }
 
         .settings-container { display: flex; flex-direction: column; gap: 16px; max-width: 800px; padding-bottom: 24px; }
         .settings-section-card { padding: 18px; border-radius: 16px; display: flex; flex-direction: column; gap: 14px; }
@@ -277,13 +297,13 @@
 
         .danger-btn { background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.25); color: #f87171; padding: 7px 14px; border-radius: 10px; cursor: pointer; font-weight: 600; font-size: 0.82rem; }
 
-        .bottom-player { 
-            height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; z-index: 100; 
-            border-radius: 18px; width: 100%; cursor: pointer; position: relative; overflow: hidden;
+        .bottom-player {
+            height: 68px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; z-index: 100;
+            border-radius: 18px; width: 100%; position: relative; overflow: hidden;
         }
 
         .player-compact-view { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 100%; }
-        .player-left { display: flex; align-items: center; gap: 10px; width: 26%; }
+        .player-left { display: flex; align-items: center; gap: 10px; width: 26%; min-width: 0; }
         .player-art { width: 40px; height: 40px; background: var(--liquid-bg); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--text-primary); border: 1px solid var(--liquid-border); flex-shrink: 0; }
         .player-meta { display: flex; flex-direction: column; overflow: hidden; }
         .player-song { font-size: 0.84rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); }
@@ -293,6 +313,8 @@
         .player-controls { display: flex; align-items: center; gap: 16px; }
         .control-action-btn { background: none; border: none; color: var(--text-secondary); font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
         .control-action-btn:hover { color: var(--text-primary); }
+        .control-action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .control-action-btn:disabled:hover { color: var(--text-secondary); }
         .play-main-btn { font-size: 1.25rem; color: var(--text-primary) !important; }
 
         .progress-bar-wrapper { width: 100%; display: flex; align-items: center; gap: 8px; font-size: 0.7rem; color: var(--text-secondary); }
@@ -306,6 +328,11 @@
         .theme-selector-panel.show { display: flex; }
         .theme-option-btn { background: var(--liquid-bg); border: 1px solid var(--liquid-border); color: var(--text-primary); padding: 6px 10px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; text-align: left; display: flex; align-items: center; gap: 8px; font-weight: 500; }
         .theme-option-btn:hover { background: var(--accent); color: white; }
+        .theme-option-btn.active-theme { border-color: var(--accent); }
+
+        .toast-container { position: fixed; bottom: 92px; left: 50%; transform: translateX(-50%); z-index: 999999; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+        .toast { padding: 10px 18px; border-radius: 12px; font-size: 0.82rem; font-weight: 500; background: var(--dropdown-bg); border: 1px solid var(--liquid-border); color: var(--text-primary); box-shadow: 0 12px 30px rgba(0,0,0,0.4); animation: toastIn 0.2s ease; }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -333,6 +360,7 @@
                     <input type="password" class="auth-input" id="auth-password-input" placeholder="••••••••" required>
                 </div>
 
+                <div class="auth-error-banner" id="auth-error-banner"></div>
                 <div class="guest-banner" id="guest-notice-banner" style="display: none;">
                     ⚠️ <strong>Guest Mode Active:</strong> Your songs and preferences will remain local to this session and <em>won't be saved</em> to Firebase until you sign up or log in.
                 </div>
@@ -344,7 +372,7 @@
                 <span class="auth-link" id="auth-switch-mode-btn">Create an account</span>
                 <span class="auth-link" id="auth-forgot-password-btn">Forgot password?</span>
             </div>
-            
+
             <hr style="border: none; border-top: 1px solid var(--liquid-border); margin: 2px 0;">
             <button type="button" class="auth-btn" id="guest-mode-btn" style="background: var(--liquid-bg); color: var(--text-primary); border: 1px solid var(--liquid-border);">Continue as Guest</button>
         </div>
@@ -353,7 +381,7 @@
     <div class="app-layout">
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <button id="sidebar-toggle" class="icon-btn" title="Toggle Navigation">
+                <button id="sidebar-toggle" class="icon-btn" title="Toggle Navigation" type="button">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                 </button>
                 <div class="brand-info">
@@ -362,27 +390,27 @@
                 </div>
             </div>
             <nav class="sidebar-nav">
-                <button class="nav-item active" data-target="discover-view">
+                <button class="nav-item active" data-target="discover-view" type="button">
                     <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                     <span>Discover</span>
                 </button>
-                <button class="nav-item" data-target="albums-view">
+                <button class="nav-item" data-target="albums-view" type="button">
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg>
                     <span>Albums</span>
                 </button>
-                <button class="nav-item" data-target="playlist-view">
+                <button class="nav-item" data-target="playlist-view" type="button">
                     <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
                     <span>Playlist</span>
                 </button>
-                <button class="nav-item" data-target="artists-view">
+                <button class="nav-item" data-target="artists-view" type="button">
                     <svg viewBox="0 0 24 20"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                     <span>Artists</span>
                 </button>
-                <button class="nav-item" data-target="blend-view">
+                <button class="nav-item" data-target="blend-view" type="button">
                     <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
                     <span>Blend</span>
                 </button>
-                <button class="nav-item" data-target="settings-view" id="nav-settings-btn">
+                <button class="nav-item" data-target="settings-view" id="nav-settings-btn" type="button">
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     <span>Settings & Privacy</span>
                 </button>
@@ -394,20 +422,23 @@
                 <div class="search-container liquid-glass-effect">
                     <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                     <input type="text" id="search-input" placeholder="Search catalog, tracks, or artists...">
+                    <button class="search-clear-btn" id="search-clear-btn" type="button" title="Clear search">
+                        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
                 </div>
-                
+
                 <div class="user-container">
                     <button class="user-icon-btn liquid-glass-effect" id="user-menu-toggle" type="button" title="User Account Profile">
                         <img src="" alt="User Avatar" id="main-avatar">
                     </button>
-                    
+
                     <div class="user-dropdown" id="user-dropdown">
                         <div class="avatar-wrapper">
                             <img src="" alt="User Avatar" id="dropdown-avatar">
                         </div>
                         <input type="text" id="username-display-input" class="glass-input" readonly style="text-align: center; padding: 5px; font-size: 0.82rem; margin-top: 2px; border: none; background: transparent; pointer-events: none;">
                         <hr style="border: none; border-top: 1px solid var(--liquid-border); margin: 3px 0;">
-                        
+
                         <label for="audio-file-importer" class="dropdown-item" style="cursor: pointer;">
                             <div class="item-left">
                                 <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
@@ -415,24 +446,24 @@
                             </div>
                         </label>
                         <input type="file" id="audio-file-importer" accept="audio/*" multiple hidden>
-                        
-                        <button class="dropdown-item" id="themes-menu-btn" style="width: 100%;">
+
+                        <button class="dropdown-item" id="themes-menu-btn" style="width: 100%;" type="button">
                             <div class="item-left">
                                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle></svg>
                                 <span>Workspace Theme</span>
                             </div>
                             <svg viewBox="0 0 24 24" style="width: 12px; height: 12px;" id="themes-chevron"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </button>
-                        
+
                         <div class="theme-selector-panel" id="theme-selector-panel">
-                            <button class="theme-option-btn" data-theme="dark">Dark Workspace</button>
-                            <button class="theme-option-btn" data-theme="light">Light Workspace</button>
-                            <button class="theme-option-btn" data-theme="cyberpunk">Cyberpunk Node</button>
-                            <button class="theme-option-btn" data-theme="sunset">Sunset Glow</button>
+                            <button class="theme-option-btn" data-theme="dark" type="button">Dark Workspace</button>
+                            <button class="theme-option-btn" data-theme="light" type="button">Light Workspace</button>
+                            <button class="theme-option-btn" data-theme="cyberpunk" type="button">Cyberpunk Node</button>
+                            <button class="theme-option-btn" data-theme="sunset" type="button">Sunset Glow</button>
                         </div>
 
                         <hr style="border: none; border-top: 1px solid var(--liquid-border); margin: 2px 0;">
-                        <button class="dropdown-item" id="sign-out-btn" style="color: #f87171; width: 100%;">
+                        <button class="dropdown-item" id="sign-out-btn" style="color: #f87171; width: 100%;" type="button">
                             <div class="item-left" style="color: #f87171;">
                                 <svg viewBox="0 0 24 24" style="stroke: #f87171;"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline></svg>
                                 <span id="sign-out-text">Sign Out</span>
@@ -465,36 +496,37 @@
                     </div>
                     <h2 style="font-size: 1.02rem; margin-bottom: 10px; font-weight: 600;">Recent Library Highlights</h2>
                     <ul class="track-list" id="discover-track-list">
-                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Import local audio files via the account menu to populate your library index.</p>
+                        <p class="empty-state-text" id="discover-empty-text">Import local audio files via the account menu to populate your library index.</p>
                     </ul>
                 </section>
 
                 <section id="albums-view" class="view">
                     <h1>Albums</h1>
-                    <p style="color: var(--text-secondary); font-size: 0.88rem;">Your imported collection grouped by studio release albums.</p>
+                    <p class="empty-state-text">Your imported collection grouped by studio release albums.</p>
                 </section>
 
                 <section id="playlist-view" class="view">
                     <h1>Playlists</h1>
                     <ul class="track-list" id="main-playlist-list">
-                        <p style="color: var(--text-secondary); font-size: 0.85rem;">No tracks added yet. Use "Import Local Tracks" from your user menu.</p>
+                        <p class="empty-state-text" id="playlist-empty-text">No tracks added yet. Use "Import Local Tracks" from your user menu.</p>
                     </ul>
                 </section>
 
                 <section id="artists-view" class="view">
                     <h1>Artists</h1>
                     <div class="track-list" id="artists-list-container">
-                        <p style="color: var(--text-secondary); font-size: 0.85rem;">Tracks will be systematically grouped by artist metadata automatically.</p>
+                        <p class="empty-state-text" id="artists-empty-text">Tracks will be systematically grouped by artist metadata automatically.</p>
                     </div>
                 </section>
 
                 <section id="blend-view" class="view">
                     <h1>Blend Rooms</h1>
-                    <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 14px;">Secure collaborative listening room synced with Firebase.</p>
+                    <p class="empty-state-text" style="margin-bottom: 14px;">Secure collaborative listening room synced with Firebase.</p>
                     <div class="blend-box">
                         <input type="text" id="blend-room-name-input" class="glass-input" placeholder="Custom Blend Room Name">
-                        <button class="glass-btn" id="create-blend-btn">Create Secure Room</button>
+                        <button class="glass-btn" id="create-blend-btn" type="button">Create Secure Room</button>
                     </div>
+                    <div class="blend-room-list" id="blend-room-list"></div>
                 </section>
 
                 <section id="settings-view" class="view">
@@ -519,7 +551,7 @@
                                     <span class="settings-label">Clear Local Cache</span>
                                     <span class="settings-desc">Delete cached metadata and artwork buffers.</span>
                                 </div>
-                                <button class="danger-btn" id="clear-cache-btn">Clear Cache</button>
+                                <button class="danger-btn" id="clear-cache-btn" type="button">Clear Cache</button>
                             </div>
                         </div>
                     </div>
@@ -542,12 +574,12 @@
 
             <div class="player-center">
                 <div class="player-controls">
-                    <button class="control-action-btn" id="player-prev-btn" title="Previous Track">
+                    <button class="control-action-btn" id="player-prev-btn" title="Previous Track" type="button" disabled>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="19 20 9 12 19 4 19 20"></polygon><line x1="5" y1="4" x2="5" y2="20"></line></svg>
                     </button>
-                    <button class="control-action-btn play-main-btn" id="player-play-pause-btn" title="Play / Pause">
+                    <button class="control-action-btn play-main-btn" id="player-play-pause-btn" title="Play / Pause" type="button">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8" fill="currentColor"></polygon></svg>
-                    </button><button class="control-action-btn" id="player-next-btn" title="Next Track">
+                    </button><button class="control-action-btn" id="player-next-btn" title="Next Track" type="button" disabled>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"></polygon><line x1="19" y1="4" x2="19" y2="20"></line></svg>
                     </button>
                 </div>
@@ -562,15 +594,17 @@
                 <input type="range" class="volume-range" id="player-volume-bar" value="100" min="0" max="100">
             </div>
         </div>
-        
+
         <audio id="core-audio-element"></audio>
     </footer>
+
+    <div class="toast-container" id="toast-container"></div>
 
     <!-- Firebase SDK Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD8F8Buvjfx4XWWub0w0L5kIKjIr2h8D2I",
@@ -586,9 +620,25 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // UI Auth State Management
-        let isSignUpMode = false;
-        let isForgotPasswordMode = false;
+        /* ---------------------------------------------------------------
+           Small toast helper (replaces some noisier alert() calls)
+        --------------------------------------------------------------- */
+        const toastContainer = document.getElementById('toast-container');
+        function showToast(message, duration = 2600) {
+            const el = document.createElement('div');
+            el.className = 'toast';
+            el.textContent = message;
+            toastContainer.appendChild(el);
+            setTimeout(() => el.remove(), duration);
+        }
+
+        /* ---------------------------------------------------------------
+           Auth overlay state machine (sign-in / sign-up / reset)
+        --------------------------------------------------------------- */
+        let authMode = 'signin'; // 'signin' | 'signup' | 'reset'
+        let isGuest = false;
+        let currentUid = null;
+
         const authOverlay = document.getElementById('auth-overlay');
         const authForm = document.getElementById('firebase-auth-form');
         const authFormTitle = document.getElementById('auth-form-title');
@@ -596,6 +646,7 @@
         const nameGroup = document.getElementById('name-group');
         const passwordGroup = document.getElementById('password-group');
         const guestNoticeBanner = document.getElementById('guest-notice-banner');
+        const authErrorBanner = document.getElementById('auth-error-banner');
         const authSubmitBtn = document.getElementById('auth-submit-btn');
         const authSwitchModeBtn = document.getElementById('auth-switch-mode-btn');
         const authForgotPasswordBtn = document.getElementById('auth-forgot-password-btn');
@@ -603,50 +654,61 @@
         const userTierBadge = document.getElementById('user-tier-badge');
         const signOutBtn = document.getElementById('sign-out-btn');
         const signOutText = document.getElementById('sign-out-text');
-        
+
         const usernameDisplayInput = document.getElementById('username-display-input');
         const settingsDisplayName = document.getElementById('settings-display-name');
         const mainAvatar = document.getElementById('main-avatar');
         const dropdownAvatar = document.getElementById('dropdown-avatar');
 
-        // Toggle Switch for Login / Sign Up / Forgot Password
-        authSwitchModeBtn.addEventListener('click', () => {
-            isSignUpMode = !isSignUpMode;
-            isForgotPasswordMode = false;
+        function setAuthMode(mode) {
+            authMode = mode;
+            authErrorBanner.style.display = 'none';
             guestNoticeBanner.style.display = 'none';
-            passwordGroup.style.display = 'flex';
-            
-            if (isSignUpMode) {
+
+            if (mode === 'signup') {
                 authFormTitle.textContent = "Create Account";
                 authFormSubtitle.textContent = "Register to permanently sync your data with Firebase";
                 nameGroup.style.display = 'flex';
+                passwordGroup.style.display = 'flex';
                 authSubmitBtn.textContent = "Sign Up";
                 authSwitchModeBtn.textContent = "Already have an account? Sign In";
+                authForgotPasswordBtn.style.display = 'inline';
+            } else if (mode === 'reset') {
+                authFormTitle.textContent = "Reset Password";
+                authFormSubtitle.textContent = "Enter your email to receive verification reset instructions";
+                nameGroup.style.display = 'none';
+                passwordGroup.style.display = 'none';
+                authSubmitBtn.textContent = "Send Reset Email";
+                authSwitchModeBtn.textContent = "Back to Sign In";
+                authForgotPasswordBtn.style.display = 'none';
             } else {
                 authFormTitle.textContent = "Welcome to Harmony";
                 authFormSubtitle.textContent = "Sign in or register to sync your library with Firebase";
                 nameGroup.style.display = 'none';
+                passwordGroup.style.display = 'flex';
                 authSubmitBtn.textContent = "Sign In";
                 authSwitchModeBtn.textContent = "Create an account";
+                authForgotPasswordBtn.style.display = 'inline';
+            }
+        }
+
+        authSwitchModeBtn.addEventListener('click', () => {
+            if (authMode === 'reset') {
+                setAuthMode('signin');
+            } else if (authMode === 'signup') {
+                setAuthMode('signin');
+            } else {
+                setAuthMode('signup');
             }
         });
 
-        authForgotPasswordBtn.addEventListener('click', () => {
-            isForgotPasswordMode = true;
-            isSignUpMode = false;
-            guestNoticeBanner.style.display = 'none';
-            authFormTitle.textContent = "Reset Password";
-            authFormSubtitle.textContent = "Enter your email to receive verification reset instructions";
-            nameGroup.style.display = 'none';
-            passwordGroup.style.display = 'none';
-            authSubmitBtn.textContent = "Send Reset Email";
-            authSwitchModeBtn.textContent = "Back to Sign In";
-        });
+        authForgotPasswordBtn.addEventListener('click', () => setAuthMode('reset'));
 
         guestModeBtn.addEventListener('click', () => {
-            // Strictly hide/clear any names or placeholders in guest mode
-            usernameDisplayInput.value = "";
-            settingsDisplayName.value = "";
+            isGuest = true;
+            currentUid = null;
+            usernameDisplayInput.value = "Guest";
+            settingsDisplayName.value = "Guest";
             mainAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=GuestSession";
             dropdownAvatar.src = "https://api.dicebear.com/7.x/avataaars/svg?seed=GuestSession";
 
@@ -656,71 +718,130 @@
             authOverlay.style.display = 'none';
         });
 
-        // Form Submission Logic
+        function showAuthError(message) {
+            authErrorBanner.textContent = message;
+            authErrorBanner.style.display = 'block';
+        }
+
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email-input').value;
             const password = document.getElementById('auth-password-input').value;
             const inputName = document.getElementById('auth-name-input').value;
+            authErrorBanner.style.display = 'none';
+            authSubmitBtn.disabled = true;
 
             try {
-                if (isForgotPasswordMode) {
+                if (authMode === 'reset') {
                     await sendPasswordResetEmail(auth, email);
-                    alert("Password reset email sent! Check your inbox.");
-                    isForgotPasswordMode = false;
-                    authForgotPasswordBtn.click();
-                } else if (isSignUpMode) {
+                    showToast("Password reset email sent — check your inbox.");
+                    setAuthMode('signin');
+                } else if (authMode === 'signup') {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const displayName = inputName.trim() || email.split('@')[0];
-                    usernameDisplayInput.value = displayName;
-                    settingsDisplayName.value = displayName;
-                    mainAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`;
-                    dropdownAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`;
-                    
-                    alert("Account created successfully!");
+                    applyProfile(displayName);
+                    isGuest = false;
+                    currentUid = userCredential.user.uid;
+                    await loadRemoteLibrary(currentUid);
                     authOverlay.style.display = 'none';
                 } else {
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     const displayName = userCredential.user.displayName || email.split('@')[0];
-                    usernameDisplayInput.value = displayName;
-                    settingsDisplayName.value = displayName;
-                    mainAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`;
-                    dropdownAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`;
-                    
+                    applyProfile(displayName);
+                    isGuest = false;
+                    currentUid = userCredential.user.uid;
+                    await loadRemoteLibrary(currentUid);
                     authOverlay.style.display = 'none';
                 }
             } catch (error) {
-                alert("Authentication Error: " + error.message);
+                showAuthError(error.message.replace('Firebase: ', ''));
+            } finally {
+                authSubmitBtn.disabled = false;
             }
         });
 
+        function applyProfile(displayName) {
+            usernameDisplayInput.value = displayName;
+            settingsDisplayName.value = displayName;
+            mainAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`;
+            dropdownAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`;
+        }
+
         signOutBtn.addEventListener('click', async () => {
             try {
-                await signOut(auth);
-            } catch (e) {}
+                if (!isGuest) await signOut(auth);
+            } catch (e) { /* ignore network errors on sign-out */ }
+            isGuest = false;
+            currentUid = null;
             usernameDisplayInput.value = "";
             settingsDisplayName.value = "";
             mainAvatar.src = "";
             dropdownAvatar.src = "";
+            setAuthMode('signin');
             authOverlay.style.display = 'flex';
-            guestNoticeBanner.style.display = 'none';
         });
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 userTierBadge.textContent = "Enterprise User";
                 const displayName = user.displayName || user.email.split('@')[0];
-                usernameDisplayInput.value = displayName;
-                settingsDisplayName.value = displayName;
-                mainAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`;
-                dropdownAvatar.src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(displayName)}`;
+                applyProfile(displayName);
+                isGuest = false;
+                currentUid = user.uid;
                 authOverlay.style.display = 'none';
+                loadRemoteLibrary(user.uid);
             }
         });
 
-        // Basic Player UI bindings
+        /* ---------------------------------------------------------------
+           Firestore-backed library metadata (title/artist only — actual
+           audio blobs live only in the browser tab and cannot be
+           persisted to Firestore, so re-imported files are needed after
+           a refresh; cached entries are shown as reference only).
+        --------------------------------------------------------------- */
+        async function saveTrackMeta(uid, track) {
+            if (!uid) return;
+            try {
+                await setDoc(doc(db, 'users', uid), {
+                    tracks: arrayUnion({ title: track.title, artist: track.artist })
+                }, { merge: true });
+            } catch (err) {
+                console.error('Could not sync track metadata to Firestore', err);
+            }
+        }
+
+        async function loadRemoteLibrary(uid) {
+            try {
+                const snap = await getDoc(doc(db, 'users', uid));
+                if (snap.exists()) {
+                    const data = snap.data();
+                    if (Array.isArray(data.tracks)) {
+                        renderCachedLibrary(data.tracks);
+                    }
+                }
+            } catch (err) {
+                console.error('Could not load cached library from Firestore', err);
+            }
+        }
+
+        function renderCachedLibrary(tracks) {
+            if (!tracks.length || playlist.length) return;
+            discoverEmptyText.style.display = 'none';
+            playlistEmptyText.style.display = 'none';
+            tracks.forEach(t => {
+                const li = buildTrackElement(t.title, t.artist, null, true);
+                mainPlaylistList.appendChild(li);
+                discoverTrackList.appendChild(li.cloneNode(true));
+            });
+        }
+
+        /* ---------------------------------------------------------------
+           Player / library state
+        --------------------------------------------------------------- */
         const coreAudio = document.getElementById('core-audio-element');
         const playPauseBtn = document.getElementById('player-play-pause-btn');
+        const prevBtn = document.getElementById('player-prev-btn');
+        const nextBtn = document.getElementById('player-next-btn');
         const progressBar = document.getElementById('player-progress-bar');
         const volumeBar = document.getElementById('player-volume-bar');
         const currentTimeEl = document.getElementById('player-time-current');
@@ -730,49 +851,154 @@
         const audioFileImporter = document.getElementById('audio-file-importer');
         const mainPlaylistList = document.getElementById('main-playlist-list');
         const discoverTrackList = document.getElementById('discover-track-list');
-        
-        let playlist = [];
+        const discoverEmptyText = document.getElementById('discover-empty-text');
+        const playlistEmptyText = document.getElementById('playlist-empty-text');
+        const statMostSong = document.getElementById('stat-most-song');
+        const statMostArtist = document.getElementById('stat-most-artist');
+        const statListeningTime = document.getElementById('stat-listening-time');
+
+        let playlist = [];       // { title, artist, url }
         let currentTrackIndex = -1;
+        let playCounts = {};     // index -> count
+        const sessionStart = Date.now();
+
+        function trackThumbSvg() {
+            return '<svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>';
+        }
+
+        function buildTrackElement(title, artist, index, isCached) {
+            const li = document.createElement('li');
+            li.className = 'track-item' + (isCached ? ' cached' : '');
+            li.dataset.title = title.toLowerCase();
+            li.dataset.artist = artist.toLowerCase();
+
+            const left = document.createElement('div');
+            left.className = 'track-info-left';
+
+            const thumb = document.createElement('div');
+            thumb.className = 'track-thumb';
+            thumb.innerHTML = trackThumbSvg();
+
+            const titles = document.createElement('div');
+            titles.className = 'track-titles';
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'track-title';
+            titleSpan.textContent = title;
+            const artistSpan = document.createElement('span');
+            artistSpan.className = 'track-artist-name';
+            artistSpan.textContent = artist;
+            titles.appendChild(titleSpan);
+            titles.appendChild(artistSpan);
+
+            left.appendChild(thumb);
+            left.appendChild(titles);
+            li.appendChild(left);
+
+            if (isCached) {
+                const note = document.createElement('span');
+                note.className = 'track-note';
+                note.textContent = 'Saved — re-import to play';
+                li.appendChild(note);
+            } else {
+                const count = document.createElement('span');
+                count.className = 'track-play-count';
+                count.id = `play-count-${index}`;
+                count.textContent = '';
+                li.appendChild(count);
+
+                li.addEventListener('click', () => {
+                    loadTrack(index);
+                    coreAudio.play();
+                });
+            }
+
+            return li;
+        }
+
+        function renderTrackUI(track, index) {
+            discoverEmptyText.style.display = 'none';
+            playlistEmptyText.style.display = 'none';
+            const playlistEl = buildTrackElement(track.title, track.artist, index, false);
+            const discoverEl = buildTrackElement(track.title, track.artist, index, false);
+            mainPlaylistList.appendChild(playlistEl);
+            discoverTrackList.appendChild(discoverEl);
+        }
 
         audioFileImporter.addEventListener('change', (e) => {
             const files = Array.from(e.target.files);
-            if(files.length === 0) return;
-            if(playlist.length === 0) {
-                mainPlaylistList.innerHTML = '';
-                discoverTrackList.innerHTML = '';
-            }
+            if (files.length === 0) return;
             files.forEach((file) => {
                 const trackObj = { title: file.name.replace(/\.[^/.]+$/, ""), artist: 'Local Audio', url: URL.createObjectURL(file) };
+                const index = playlist.length;
                 playlist.push(trackObj);
-                renderTrackUI(trackObj, playlist.length - 1);
+                renderTrackUI(trackObj, index);
+                if (!isGuest && currentUid) saveTrackMeta(currentUid, trackObj);
             });
-            if(currentTrackIndex === -1 && playlist.length > 0) loadTrack(0);
+            if (currentTrackIndex === -1 && playlist.length > 0) loadTrack(0);
+            updateTransportButtons();
+            audioFileImporter.value = '';
         });
 
-        function renderTrackUI(track, index) {
-            const li = document.createElement('li');
-            li.className = 'track-item';
-            li.innerHTML = `<div class="track-info-left"><div class="track-thumb"><svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"></path></svg></div><div class="track-titles"><span class="track-title">${track.title}</span><span class="track-artist-name">${track.artist}</span></div></div>`;
-            li.addEventListener('click', () => { loadTrack(index); coreAudio.play(); });
-            mainPlaylistList.appendChild(li);
-            discoverTrackList.appendChild(li.cloneNode(true));
-        }
-
         function loadTrack(index) {
+            if (index < 0 || index >= playlist.length) return;
             currentTrackIndex = index;
             const track = playlist[index];
             coreAudio.src = track.url;
             currentTitleEl.textContent = track.title;
             currentArtistEl.textContent = track.artist;
+
+            playCounts[index] = (playCounts[index] || 0) + 1;
+            const countEl = document.getElementById(`play-count-${index}`);
+            if (countEl) countEl.textContent = `${playCounts[index]} play${playCounts[index] === 1 ? '' : 's'}`;
+
+            document.querySelectorAll('.track-item').forEach(el => el.classList.remove('playing'));
+
+            updateTransportButtons();
+            updateStats();
         }
 
+        function updateTransportButtons() {
+            prevBtn.disabled = currentTrackIndex <= 0;
+            nextBtn.disabled = currentTrackIndex === -1 || currentTrackIndex >= playlist.length - 1;
+        }
+
+        function updateStats() {
+            if (!playlist.length) return;
+            let bestIndex = 0;
+            let bestCount = -1;
+            Object.keys(playCounts).forEach(i => {
+                if (playCounts[i] > bestCount) { bestCount = playCounts[i]; bestIndex = Number(i); }
+            });
+            if (bestCount > 0) {
+                statMostSong.textContent = playlist[bestIndex].title;
+                statMostArtist.textContent = playlist[bestIndex].artist;
+            }
+        }
+
+        function updateSessionDuration() {
+            const mins = Math.max(0, Math.round((Date.now() - sessionStart) / 60000));
+            statListeningTime.textContent = `${mins} min${mins === 1 ? '' : 's'}`;
+        }
+        setInterval(updateSessionDuration, 15000);
+        updateSessionDuration();
+
         playPauseBtn.addEventListener('click', () => {
-            if(!coreAudio.src) return;
-            if(coreAudio.paused) coreAudio.play(); else coreAudio.pause();
+            if (!coreAudio.src) return;
+            if (coreAudio.paused) coreAudio.play(); else coreAudio.pause();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentTrackIndex > 0) { loadTrack(currentTrackIndex - 1); coreAudio.play(); }
+        });
+        nextBtn.addEventListener('click', () => {
+            if (currentTrackIndex < playlist.length - 1) { loadTrack(currentTrackIndex + 1); coreAudio.play(); }
+        });
+        coreAudio.addEventListener('ended', () => {
+            if (currentTrackIndex < playlist.length - 1) { loadTrack(currentTrackIndex + 1); coreAudio.play(); }
         });
 
         coreAudio.addEventListener('timeupdate', () => {
-            if(coreAudio.duration) {
+            if (coreAudio.duration) {
                 progressBar.value = (coreAudio.currentTime / coreAudio.duration) * 100;
                 let curMins = Math.floor(coreAudio.currentTime / 60);
                 let curSecs = Math.floor(coreAudio.currentTime % 60);
@@ -783,9 +1009,15 @@
             }
         });
 
+        progressBar.addEventListener('input', (e) => {
+            if (coreAudio.duration) coreAudio.currentTime = (e.target.value / 100) * coreAudio.duration;
+        });
+
         volumeBar.addEventListener('input', (e) => { coreAudio.volume = e.target.value / 100; });
-        
-        // Navigation & Theme toggles
+
+        /* ---------------------------------------------------------------
+           Navigation
+        --------------------------------------------------------------- */
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', () => {
                 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -795,16 +1027,125 @@
             });
         });
 
-        document.getElementById('user-menu-toggle').addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('user-dropdown').classList.toggle('show');
+        document.getElementById('sidebar-toggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
         });
 
-        document.querySelectorAll('.theme-option-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.body.className = '';
-                if(btn.dataset.theme !== 'dark') document.body.classList.add('theme-' + btn.dataset.theme);
+        /* ---------------------------------------------------------------
+           User dropdown + theme panel
+        --------------------------------------------------------------- */
+        const userDropdown = document.getElementById('user-dropdown');
+        const userMenuToggle = document.getElementById('user-menu-toggle');
+        const themesMenuBtn = document.getElementById('themes-menu-btn');
+        const themePanel = document.getElementById('theme-selector-panel');
+        const themesChevron = document.getElementById('themes-chevron');
+
+        userMenuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+        });
+
+        themesMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            themePanel.classList.toggle('show');
+            themesChevron.style.transform = themePanel.classList.contains('show') ? 'rotate(90deg)' : 'rotate(0deg)';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!userDropdown.contains(e.target) && !userMenuToggle.contains(e.target)) {
+                userDropdown.classList.remove('show');
+                themePanel.classList.remove('show');
+                themesChevron.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        function applyTheme(themeName) {
+            document.body.className = '';
+            if (themeName !== 'dark') document.body.classList.add('theme-' + themeName);
+            document.querySelectorAll('.theme-option-btn').forEach(b => {
+                b.classList.toggle('active-theme', b.dataset.theme === themeName);
             });
+            try { localStorage.setItem('harmony_theme', themeName); } catch (e) { /* storage unavailable */ }
+        }
+
+        document.querySelectorAll('.theme-option-btn').forEach(btn => {
+            btn.addEventListener('click', () => applyTheme(btn.dataset.theme));
+        });
+
+        try {
+            const savedTheme = localStorage.getItem('harmony_theme');
+            if (savedTheme) applyTheme(savedTheme);
+        } catch (e) { /* storage unavailable */ }
+
+        /* ---------------------------------------------------------------
+           Search — filters whichever list is currently in view
+        --------------------------------------------------------------- */
+        const searchInput = document.getElementById('search-input');
+        const searchClearBtn = document.getElementById('search-clear-btn');
+
+        function applySearchFilter() {
+            const query = searchInput.value.trim().toLowerCase();
+            searchClearBtn.classList.toggle('show', query.length > 0);
+            document.querySelectorAll('#main-playlist-list .track-item, #discover-track-list .track-item').forEach(li => {
+                const match = !query || li.dataset.title.includes(query) || li.dataset.artist.includes(query);
+                li.classList.toggle('hidden-by-search', !match);
+            });
+        }
+        searchInput.addEventListener('input', applySearchFilter);
+        searchClearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            applySearchFilter();
+            searchInput.focus();
+        });
+
+        /* ---------------------------------------------------------------
+           Settings — clear cache
+        --------------------------------------------------------------- */
+        document.getElementById('clear-cache-btn').addEventListener('click', () => {
+            try {
+                Object.keys(localStorage)
+                    .filter(k => k.startsWith('harmony_') && k !== 'harmony_theme')
+                    .forEach(k => localStorage.removeItem(k));
+            } catch (e) { /* storage unavailable */ }
+            document.querySelectorAll('.track-item.cached').forEach(el => el.remove());
+            showToast('Cached metadata and artwork buffers cleared.');
+        });
+
+        /* ---------------------------------------------------------------
+           Blend rooms
+        --------------------------------------------------------------- */
+        const blendRoomNameInput = document.getElementById('blend-room-name-input');
+        const createBlendBtn = document.getElementById('create-blend-btn');
+        const blendRoomList = document.getElementById('blend-room-list');
+
+        createBlendBtn.addEventListener('click', async () => {
+            const name = blendRoomNameInput.value.trim();
+            if (!name) { showToast('Give the room a name first.'); return; }
+            createBlendBtn.disabled = true;
+            try {
+                const roomRef = await addDoc(collection(db, 'blendRooms'), {
+                    name,
+                    createdBy: currentUid || 'guest',
+                    createdAt: serverTimestamp()
+                });
+                const roomItem = document.createElement('div');
+                roomItem.className = 'blend-room-item';
+                const nameSpan = document.createElement('span');
+                nameSpan.textContent = name;
+                const codeSpan = document.createElement('span');
+                codeSpan.className = 'blend-room-code';
+                codeSpan.textContent = roomRef.id.slice(0, 6).toUpperCase();
+                roomItem.appendChild(nameSpan);
+                roomItem.appendChild(codeSpan);
+                blendRoomList.prepend(roomItem);
+                blendRoomNameInput.value = '';
+                showToast(`Room "${name}" created — share code ${codeSpan.textContent}`);
+            } catch (err) {
+                showToast('Could not create the room. Check your connection and try again.');
+                console.error(err);
+            } finally {
+                createBlendBtn.disabled = false;
+            }
         });
     </script>
 </body>
