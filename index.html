@@ -660,6 +660,14 @@
         const mainAvatar = document.getElementById('main-avatar');
         const dropdownAvatar = document.getElementById('dropdown-avatar');
 
+        const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+
+sidebarToggle.addEventListener('click', (event) => {
+    event.stopPropagation();
+    sidebar.classList.toggle('collapsed');
+});
+
         // Toggle Switch for Login / Sign Up / Forgot Password
         authSwitchModeBtn.addEventListener('click', () => {
             isSignUpMode = !isSignUpMode;
